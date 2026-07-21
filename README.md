@@ -17,10 +17,14 @@ Der Level-Editor ist unter `http://localhost:8080/level-editor.html` erreichbar.
 ## Level-Editor
 
 - Levelelemente und Spawnpunkte besitzen getrennte Ebenen und dürfen auf demselben Rasterfeld liegen.
-- Themes werden links als Paletten gewählt: Village, Dschungel, Mountain, Tempel und Gameplay können innerhalb desselben Levels beliebig kombiniert werden.
+- Themes werden links als Paletten gewählt: Village, Dschungel, Mountain, Tempel, Dungeon und Gameplay können innerhalb desselben Levels beliebig kombiniert werden.
 - Linksklick und Ziehen malt das aktive Element fortlaufend ins Raster; jedes Feld wird pro Malvorgang höchstens einmal belegt. Rechtsklick löscht nur auf der aktiven Ebene.
 - Eigenschaften wie Position, Breite und Höhe lassen sich numerisch bearbeiten.
-- Die Levelbreite beginnt bei 1280 px und lässt sich bildschirmweise um jeweils 1280 px verlängern.
+- Ein Level beginnt bei 1280×720 px. Breite und Höhe lassen sich um exakt eine Bildschirmbreite (1280 px) beziehungsweise Bildschirmhöhe (720 px) vergrößern und wieder reduzieren.
+- Die Minimap zeigt das gesamte Level; ein Klick darauf verschiebt den Arbeitsbereich horizontal und vertikal.
+- Eine eigene Hintergrundebene bietet einen erweiterbaren Katalog freigestellter Maya-Landschaftsobjekte mit einstellbarer Z-Tiefe und Skalierung.
+- Pro Bildschirmausschnitt stehen Village-, Dschungel-, Mountain-, Tempel- und Dungeon-Vorlagen bereit.
+- Der Horizont kann als Außenbereich mit Tag/Nacht und Wetter (klar, wolkig, Regen oder Schnee) oder als dunkler Höhlen-Innenraum konfiguriert werden.
 - Übereinanderliegende Boden- und Steinreihen verschmelzen visuell; nur die oberste Reihe erhält Gras beziehungsweise eine helle Steinkante.
 - Eine `boss_arena` markiert den zulässigen Bewegungs- und Kampfbereich des Cursed Vulture.
 - Undo/Redo, Browser-Speicher, JSON-Import und JSON-Export sind integriert.
@@ -32,7 +36,7 @@ Das JSON-Format enthält `terrain`, `spawns` und `sprites` getrennt. Dadurch kan
 ## Gegnerphysik
 
 - Gegner werden erst aktiviert, sobald ihr Spawnpunkt in den sichtbaren Viewport gelangt.
-- Laufende Gegner kollidieren mit Levelgeometrie und sterben beim Verlassen eines begehbaren Bodens; fliegende Gegner sind davon ausgenommen.
+- Spieler und laufende Gegner kollidieren mit Hindernissen. Sie dürfen von Kanten auf tiefer gelegene Plattformen fallen und sterben erst, wenn sie ohne Landung das untere Levelende erreichen; fliegende Gegner sind davon ausgenommen.
 - Der Boss behält seine Blickrichtung in der Nähe des Spielers und verwendet im Stillstand die zweite Sprite-Reihe `IDLE_FLOAT`.
 - Bossbewegung und gegenseitige Treffer sind auf die im Editor gesetzte Boss-Arena begrenzt.
 
@@ -53,7 +57,7 @@ Das JSON-Format enthält `terrain`, `spawns` und `sprites` getrennt. Dadurch kan
 - Gegner: Schlangen (Aufmerksamkeits-Sprint), Fledermäuse (Sinusflug), Cougars (Ansturm), Evil Priests (Gehen/Rennen und Fernangriff), Cursed Vulture (Boss).
 - Lebenspunkte: normale Gegner 1, Priester 2, Boss 3; Spieler 3 HP und 3 Continues.
 - Versteckte Truhen heilen oder verbessern Angriff, Wurf und Block.
-- Mehrschichtige, prozedural gezeichnete Parallax-Landschaft mit Z-Tiefen.
+- Mehrschichtige Parallax-Landschaft mit Z-Tiefen, freigestellten Katalog-Sprites, Wetter und Höhlenbeleuchtung.
 
 ## Sprite-Sheet-Vertrag
 
@@ -75,6 +79,7 @@ Die generierte Chroma-Key-Quelle liegt aus Gründen der Nachvollziehbarkeit unte
 - `assets/` – Runtime-Sheet und Generierungsquelle
 - `tools/build_sprite.py` – deterministische Sheet-Normalisierung (Pillow)
 - `tools/build_enemy_sprites.py` – erzeugt fünf transparente Gegner-Sheets aus dem generierten Atlas
+- `tools/build_catalog_assets.py` – normalisiert das Cougar-Sheet und erzeugt den transparenten Landschaftskatalog
 - `static_maya_game_v1.html`, `static_maya_game_v2.html` – historische Prototypen
 
 ## Git-Workflow
