@@ -23,12 +23,11 @@ def remove_key(im):
     return im
 
 
-def fit(cell, w, h):
+def fit(cell, w, h, scale):
     box = cell.getchannel("A").getbbox()
     if not box:
         return Image.new("RGBA", (w, h))
     cell = cell.crop(box)
-    scale = min((w - 4) / cell.width, (h - 4) / cell.height)
     cell = cell.resize((round(cell.width * scale), round(cell.height * scale)), Image.Resampling.NEAREST)
     out = Image.new("RGBA", (w, h))
     out.alpha_composite(cell, ((w - cell.width) // 2, h - cell.height - 2))
@@ -59,10 +58,19 @@ def main():
     src = remove_key(Image.open(SRC))
     OUT.mkdir(parents=True, exist_ok=True)
     for row, (name, count, fw, fh) in enumerate(SPECS):
+        if name == "boss":
+            # Boss has a dedicated 6x2 FLY/ATTACK + IDLE_FLOAT source/build.
+            continue
         y0, y1 = round(row * src.height / 5), round((row + 1) * src.height / 5)
         strip = src.crop((0, y0, src.width, y1))
         spans = frame_spans(strip, count)
-        frames = [fit(strip.crop((x0, 0, x1, strip.height)), fw, fh) for x0, x1 in spans]
+        raw = []
+        for x0, x1 in spans:
+            cell = strip.crop((x0, 0, x1, strip.height))
+            box = cell.getchannel("A").getbbox()
+            raw.append(cell.crop(box) if box else cell)
+        common_scale = min((fw - 4) / max(c.width for c in raw), (fh - 4) / max(c.height for c in raw))
+        frames = [fit(cell, fw, fh, common_scale) for cell in raw]
         if not frames:
             frames = [Image.new("RGBA", (fw, fh))]
         while len(frames) < 6:

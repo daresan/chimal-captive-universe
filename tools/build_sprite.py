@@ -41,13 +41,40 @@ def bbox_for_cell(source: Image.Image, col: int, row: int):
     return cell.crop(box) if box else cell
 
 
-def fit(cell: Image.Image) -> Image.Image:
+def largest_component_box(cell: Image.Image):
+    alpha = cell.getchannel("A")
+    visible = {(x, y) for y in range(cell.height) for x in range(cell.width)
+               if alpha.getpixel((x, y)) > 0}
+    best = None
+    while visible:
+        todo = [visible.pop()]
+        component = []
+        while todo:
+            x, y = todo.pop()
+            component.append((x, y))
+            for n in ((x - 1, y), (x + 1, y), (x, y - 1), (x, y + 1)):
+                if n in visible:
+                    visible.remove(n)
+                    todo.append(n)
+        if best is None or len(component) > len(best):
+            best = component
+    if not best:
+        return (0, 0, cell.width, cell.height)
+    xs, ys = zip(*best)
+    return min(xs), min(ys), max(xs) + 1, max(ys) + 1
+
+
+def fit(cell: Image.Image, row: int) -> Image.Image:
     target = Image.new("RGBA", (CELL_W, CELL_H))
-    max_w, max_h = 46, 62
-    scale = min(max_w / cell.width, max_h / cell.height)
+    bx0, by0, bx1, by1 = largest_component_box(cell)
+    body_w, body_h = bx1 - bx0, by1 - by0
+    # Detached weapons, projectiles and power-up rays do not influence body size.
+    scale = 45 / body_w if row == 13 else min(56 / body_h, 44 / body_w)
     size = (max(1, round(cell.width * scale)), max(1, round(cell.height * scale)))
     cell = cell.resize(size, Image.Resampling.NEAREST)
-    target.alpha_composite(cell, ((CELL_W - size[0]) // 2, CELL_H - size[1]))
+    body_cx = (bx0 + bx1) / 2 * scale
+    body_bottom = by1 * scale
+    target.alpha_composite(cell, (round(CELL_W / 2 - body_cx), round(CELL_H - 2 - body_bottom)))
     return target
 
 
@@ -55,7 +82,15 @@ def main():
     source = Image.open(SOURCE)
     out = Image.new("RGBA", (CELL_W * 6, CELL_H * ROWS))
     for row in range(ROWS):
-        frames = [fit(bbox_for_cell(source, col, row)) for col in range(SOURCE_COLS)]
+        raw = [bbox_for_cell(source, col, row) for col in range(SOURCE_COLS)]
+        # Some generated throw rows end with the projectile alone. A projectile
+        # is not a valid character frame; hold the last complete pose instead.
+        for col, cell in enumerate(raw):
+            skin = sum(1 for r, g, b, a in cell.getdata()
+                       if a and r > 110 and g > 40 and b < 100)
+            if skin < 1000 and col:
+                raw[col] = raw[col - 1].copy()
+        frames = [fit(cell, row) for cell in raw]
         frames.append(frames[0].copy() if row in (0, 6, 7, 12) else frames[-1].copy())
         for col, frame in enumerate(frames):
             out.alpha_composite(frame, (col * CELL_W, row * CELL_H))

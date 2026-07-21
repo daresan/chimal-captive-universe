@@ -17,13 +17,24 @@ Der Level-Editor ist unter `http://localhost:8080/level-editor.html` erreichbar.
 ## Level-Editor
 
 - Levelelemente und Spawnpunkte besitzen getrennte Ebenen und dürfen auf demselben Rasterfeld liegen.
-- Linksklick platziert das aktive Werkzeug oder wählt ein vorhandenes Objekt; Rechtsklick löscht nur auf der aktiven Ebene.
+- Themes werden links als Paletten gewählt: Village, Dschungel, Mountain, Tempel und Gameplay können innerhalb desselben Levels beliebig kombiniert werden.
+- Linksklick und Ziehen malt das aktive Element fortlaufend ins Raster; jedes Feld wird pro Malvorgang höchstens einmal belegt. Rechtsklick löscht nur auf der aktiven Ebene.
 - Eigenschaften wie Position, Breite und Höhe lassen sich numerisch bearbeiten.
+- Die Levelbreite beginnt bei 1280 px und lässt sich bildschirmweise um jeweils 1280 px verlängern.
+- Übereinanderliegende Boden- und Steinreihen verschmelzen visuell; nur die oberste Reihe erhält Gras beziehungsweise eine helle Steinkante.
+- Eine `boss_arena` markiert den zulässigen Bewegungs- und Kampfbereich des Cursed Vulture.
 - Undo/Redo, Browser-Speicher, JSON-Import und JSON-Export sind integriert.
 - **Im Spiel testen** übergibt das aktuelle Level an `index.html?editorLevel=1`.
 - Spieler- und Gegner-Sprites lassen sich über Pfad, Framegröße, Frameanzahl, Animationsreihe und Skalierung konfigurieren.
 
 Das JSON-Format enthält `terrain`, `spawns` und `sprites` getrennt. Dadurch kann ein Spawnpunkt unabhängig von einem Geländeelement auf derselben Koordinate existieren.
+
+## Gegnerphysik
+
+- Gegner werden erst aktiviert, sobald ihr Spawnpunkt in den sichtbaren Viewport gelangt.
+- Laufende Gegner kollidieren mit Levelgeometrie und sterben beim Verlassen eines begehbaren Bodens; fliegende Gegner sind davon ausgenommen.
+- Der Boss behält seine Blickrichtung in der Nähe des Spielers und verwendet im Stillstand die zweite Sprite-Reihe `IDLE_FLOAT`.
+- Bossbewegung und gegenseitige Treffer sind auf die im Editor gesetzte Boss-Arena begrenzt.
 
 ## Steuerung
 
