@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Maya Boy - 2D Jump & Run Prototyp (Local Sprite)</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: #111;
+            color: #fff;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+        h1 {
+            margin: 5px 0;
+            font-size: 1.5rem;
+            color: #ffd700;
+            text-shadow: 2px 2px #000;
+        }
+        #game-container {
+            position: relative;
+            width: 800px;
+            height: 450px;
+            border: 4px solid #5c4033;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.7);
+            background: #1a1a1a;
+        }
+        canvas {
+            display: block;
+            background: linear-gradient(to bottom, #4a3b2c, #2a2015);
+        }
+        #ui-overlay {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            font-family: monospace;
+            font-size: 16px;
+            color: #fff;
+            background: rgba(0,0,0,0.5);
+            padding: 5px 10px;
+            border-radius: 5px;
+            pointer-events: none;
+        }
+        #controls-info {
+            margin-top: 10px;
+            font-size: 0.9rem;
+            color: #aaa;
+            text-align: center;
+            max-width: 800px;
+            background: rgba(255,255,255,0.05);
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #333;
+        }
+        .key {
+            background: #333;
+            border: 1px solid #fff;
+            border-radius: 3px;
+            padding: 1px 6px;
+            color: #ffd700;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Maya Boy Adventure (Local Sprite)</h1>
+    
+    <div id="game-container">
+        <canvas id="gameCanvas" width="800" height="450"></canvas>
+        <div id="ui-overlay">
+            Status: <span id="player-state" style="color: #ffd700;">IDLE</span><br>
+            Score: <span id="player-score" style="color: #00ff00;">0</span>
+        </div>
+    </div>
+
+    <div id="controls-info">
+        <strong>Steuerung:</strong> <span class="key">A</span> / <span class="key">D</span> Gehen | <span class="key">Space</span> Springen | <span class="key">Q</span> Projektil werfen | <span class="key">E</span> Nahkampf-Attacke / Benutzen <br>
+        <em>Unterstützt auch Standard-Gamepad / Controller.</em>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const stateDisplay = document.getElementById('player-state');
+        const scoreDisplay = document.getElementById('player-score');
+
+        // LÄDT JETZT LOKAL: Das Bild muss im selben Ordner wie diese HTML-Datei liegen!
+        const spriteSheet = new Image();
+        spriteSheet.src = 'mempalace_boy_spritesheet.png'; 
+
+        const GRAVITY = 0.5;
+        const VIEWPORT_WIDTH = 800;
+        const VIEWPORT_HEIGHT = 450;
+        
+        let score = 0;
+
+        const keys = { a: false, d: false, space: false, q: false, e: false };
+
+        class Projectile {
+            constructor(x, y, direction) {
+                this.x = x;
+                this.y = y;
+                this.vx = direction * 8;
+                this.vy = -3; 
+                this.radius = 6;
+                this.active = true;
+            }
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
+                this.vy += 0.2; 
+                if (this.y > VIEWPORT_HEIGHT || this.x < 0 || this.x > 3000) {
+                    this.active = false;
+                }
+            }
+            draw(offsetX) {
+                ctx.save();
+                ctx.beginPath();
+                ctx.arc(this.x - offsetX, this.y, this.radius, 0, Math.PI * 2);
+                let gradient = ctx.createRadialGradient(this.x - offsetX, this.y, 1, this.x - offsetX, this.y, this.radius);
+                gradient.addColorStop(0, '#ffffff');
+                gradient.addColorStop(0.4, '#00ffaa');
+                gradient.addColorStop(1, '#006644');
+                ctx.fillStyle = gradient;
+                ctx.shadowColor = '#00ffaa';
+                ctx.shadowBlur = 10;
+                ctx.fill();
+                ctx.restore();
+            }
+        }
+
+        const player = {
+            x: 100,
+            y: 300,
+            width: 32, 
+            height: 64, 
+            vx: 0,
+            vy: 0,
+            isGrounded: false,
+            facingRight: true,
+            state: 'IDLE', 
+            
+            frameIndex: 0,
+            tickCount: 0,
+            ticksPerFrame: 6,
+            framesInRow: 6, 
+            
+            actionTimer: 0,
+            
+            update() {
+                let moveSpeed = keys.d ? 4 : (keys.a ? -4 : 0);
+                
+                if (moveSpeed !== 0) {
+                    this.vx = moveSpeed;
+                    this.facingRight = moveSpeed > 0;
+                    if (this.isGrounded) {
+                        this.state = 'WALK';
+                        this.framesInRow = 6; 
+                    }
+                } else {
+                    this.vx *= 0.8; 
+                    if (Math.abs(this.vx) < 0.1) this.vx = 0;
+                    if (this.isGrounded && this.actionTimer <= 0) {
+                        this.state = 'IDLE';
+                        this.framesInRow = 6; 
+                    }
+                }
+
+                if (keys.space && this.isGrounded) {
+                    this.vy = -12;
+                    this.isGrounded = false;
+                    this.state = 'JUMP';
+                    this.framesInRow = 1; 
+                }
+
+                if (this.actionTimer > 0) {
+                    this.actionTimer--;
+                } else {
+                    if (keys.q) {
+                        this.state = 'THROW';
+                        this.framesInRow = 1; 
+                        this.actionTimer = 20; 
+                        projectiles.push(new Projectile(this.x + (this.facingRight ? 30 : 10), this.y + 20, this.facingRight ? 1 : -1));
+                        keys.q = false; 
+                    } else if (keys.e) {
+                        this.state = 'ATTACK';
+                        this.framesInRow = 1; 
+                        this.actionTimer = 25;
+                        keys.e = false;
+                        checkMeleeHit();
+                    }
+                }
+
+                if (!this.isGrounded && this.actionTimer <= 0) {
+                    this.state = 'JUMP';
+                    this.framesInRow = 1;
+                }
+
+                this.vy += GRAVITY;
+                this.x += this.vx;
+                this.y += this.vy;
+
+                if (this.x < 0) this.x = 0;
+
+                this.tickCount++;
+                if (this.tickCount > this.ticksPerFrame) {
+                    this.tickCount = 0;
+                    this.frameIndex = (this.frameIndex + 1) % this.framesInRow;
+                }
+
+                stateDisplay.innerText = this.state;
+            },
+
+            draw(offsetX) {
+                let row = 0;
+                let sWidth = 48; 
+                let sHeight = 64; 
+                
+                switch(this.state) {
+                    case 'IDLE': row = 0; break;
+                    case 'WALK': row = 1; break;
+                    case 'RUN': row = 2; break;
+                    case 'JUMP': row = 4; break; 
+                    case 'THROW': row = 3; break; 
+                    case 'ATTACK': row = 3; break; 
+                }
+
+                ctx.save();
+                
+                if (!this.facingRight) {
+                    ctx.translate((this.x - offsetX) * 2 + this.width, 0);
+                    ctx.scale(-1, 1);
+                }
+
+                ctx.drawImage(
+                    spriteSheet,
+                    this.frameIndex * 48, row * 64, sWidth, sHeight,
+                    Math.floor(this.x - offsetX - 8), Math.floor(this.y - 12), sWidth * 1.3, sHeight * 1.3 
+                );
+
+                ctx.restore();
+            }
+        };
+
+        const projectiles = [];
+        
+        const platforms = [
+            { x: 0, y: 400, width: 900, height: 50, type: 'ground' },
+            { x: 1000, y: 400, width: 1200, height: 50, type: 'ground' },
+            { x: 300, y: 300, width: 150, height: 30, type: 'stone' },
+            { x: 400, y: 220, width: 150, height: 30, type: 'stone' },
+            { x: 600, y: 150, width: 200, height: 30, type: 'temple' },
+            { x: 1150, y: 300, width: 120, height: 20, type: 'wood' },
+            { x: 1350, y: 220, width: 120, height: 20, type: 'wood' },
+            { x: 1550, y: 150, width: 200, height: 30, type: 'stone' },
+            { x: 1850, y: 280, width: 150, height: 20, type: 'stone' }
+        ];
+
+        const collectibles = [
+            { x: 450, y: 180, radius: 15, active: true, type: 'totem' },
+            { x: 680, y: 110, radius: 15, active: true, type: 'gold' },
+            { x: 1400, y: 180, radius: 15, active: true, type: 'totem' },
+            { x: 1650, y: 100, radius: 20, active: true, type: 'shrine' } 
+        ];
+
+        function checkMeleeHit() {
+            collectibles.forEach(c => {
+                if (c.active && c.type === 'shrine') {
+                    let dist = Math.hypot((player.x + player.width/2) - c.x, (player.y + player.height/2) - c.y);
+                    if (dist < 60) {
+                        c.active = false;
+                        score += 500;
+                        scoreDisplay.innerText = score;
+                        alert("Du hast ein 1000 Jahre altes Maya-Heiligtum aktiviert! +500 Punkte.");
+                    }
+                }
+            });
+        }
+
+        function handleCollisions() {
+            player.isGrounded = false;
+
+            platforms.forEach(p => {
+                if (player.x < p.x + p.width &&
+                    player.x + player.width > p.x &&
+                    player.y + player.height > p.y &&
+                    player.y + player.height - player.vy <= p.y + 10) {
+                    
+                    if (player.vy > 0) {
+                        player.isGrounded = true;
+                        player.vy = 0;
+                        player.y = p.y - player.height;
+                    }
+                }
+            });
+
+            collectibles.forEach(c => {
+                if (!c.active) return;
+
+                let distToPlayer = Math.hypot((player.x + player.width/2) - c.x, (player.y + player.height/2) - c.y);
+                if (distToPlayer < c.radius + player.width/2) {
+                    if (c.type !== 'shrine') {
+                        c.active = false;
+                        score += 100;
+                        scoreDisplay.innerText = score;
+                    }
+                }
+
+                projectiles.forEach(p => {
+                    let distToProj = Math.hypot(p.x - c.x, p.y - c.y);
+                    if (distToProj < c.radius + p.radius && c.type !== 'shrine') {
+                        c.active = false;
+                        p.active = false;
+                        score += 150; 
+                        scoreDisplay.innerText = score;
+                    }
+                });
+            });
+
+            if (player.y > VIEWPORT_HEIGHT + 100) {
+                player.x = 100;
+                player.y = 200;
+                player.vy = 0;
+                score = Math.max(0, score - 50);
+                scoreDisplay.innerText = score;
+            }
+        }
+
+        function drawBackground(offsetX) {
+            let skyGrad = ctx.createLinearGradient(0, 0, 0, VIEWPORT_HEIGHT);
+            skyGrad.addColorStop(0, '#bd6a3b'); 
+            skyGrad.addColorStop(0.6, '#5c3a21'); 
+            skyGrad.addColorStop(1, '#20150c');
+            ctx.fillStyle = skyGrad;
+            ctx.fillRect(0, 0, VIEWPORT_WIDTH, VIEWPORT_HEIGHT);
+
+            ctx.fillStyle = '#3a2b1d';
+            ctx.beginPath();
+            let pyrX = 400 - offsetX * 0.2; 
+            ctx.moveTo(pyrX, 400);
+            ctx.lineTo(pyrX + 50, 300);
+            ctx.lineTo(pyrX + 70, 300);
+            ctx.lineTo(pyrX + 110, 220);
+            ctx.lineTo(pyrX + 150, 220);
+            ctx.lineTo(pyrX + 190, 300);
+            ctx.lineTo(pyrX + 210, 300);
+            ctx.lineTo(pyrX + 260, 400);
+            ctx.fill();
+
+            ctx.fillStyle = '#2d2015';
+            ctx.fillRect(pyrX + 115, 195, 30, 25);
+
+            ctx.fillStyle = '#1e2d1a';
+            for (let i = 0; i < 12; i++) {
+                let treeX = (i * 120) - (offsetX * 0.4);
+                ctx.beginPath();
+                ctx.arc(treeX, 380, 40, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.fillRect(treeX - 5, 370, 10, 40);
+            }
+        }
+
+        function drawPlatforms(offsetX) {
+            platforms.forEach(p => {
+                ctx.save();
+                
+                if (p.type === 'ground' || p.type === 'stone') {
+                    ctx.fillStyle = '#4a5343'; 
+                    ctx.fillRect(p.x - offsetX, p.y, p.width, p.height);
+                    
+                    ctx.strokeStyle = '#2d3328';
+                    ctx.lineWidth = 2;
+                    ctx.strokeRect(p.x - offsetX, p.y, p.width, p.height);
+                    
+                    ctx.fillStyle = '#3a4134';
+                    for(let step = p.x; step < p.x + p.width; step += 40) {
+                        ctx.fillRect(step - offsetX + 5, p.y + 5, 5, p.height - 10);
+                    }
+                } else if (p.type === 'temple') {
+                    ctx.fillStyle = '#8c7853'; 
+                    ctx.fillRect(p.x - offsetX, p.y, p.width, p.height);
+                    ctx.strokeStyle = '#5c4d33';
+                    ctx.strokeRect(p.x - offsetX, p.y, p.width, p.height);
+                } else {
+                    ctx.fillStyle = '#5c4033'; 
+                    ctx.fillRect(p.x - offsetX, p.y, p.width, p.height);
+                }
+                ctx.restore();
+            });
+        }
+
+        function drawCollectibles(offsetX) {
+            collectibles.forEach(c => {
+                if (!c.active) return;
+                ctx.save();
+                ctx.beginPath();
+                ctx.arc(c.x - offsetX, c.y, c.radius, 0, Math.PI * 2);
+
+                if (c.type === 'totem') {
+                    ctx.fillStyle = '#cc5500'; 
+                    ctx.fill();
+                    ctx.fillStyle = '#000';
+                    ctx.fillRect(c.x - offsetX - 4, c.y - 4, 3, 3);
+                    ctx.fillRect(c.x - offsetX + 2, c.y - 4, 3, 3);
+                    ctx.fillRect(c.x - offsetX - 4, c.y + 2, 8, 2);
+                } else if (c.type === 'gold') {
+                    ctx.fillStyle = '#ffd700'; 
+                    ctx.shadowColor = '#ffd700';
+                    ctx.shadowBlur = 8;
+                    ctx.fill();
+                } else if (c.type === 'shrine') {
+                    ctx.fillStyle = '#008080'; 
+                    ctx.fillRect(c.x - offsetX - 15, c.y - 20, 30, 40);
+                    ctx.fillStyle = '#ffd700';
+                    ctx.strokeRect(c.x - offsetX - 15, c.y - 20, 30, 40);
+                }
+                ctx.restore();
+            });
+        }
+
+        function updateGamepad() {
+            const gamepads = navigator.getGamepads ? navigator.getGamepads() : [];
+            const gp = gamepads[0]; 
+            
+            if (gp) {
+                const xAxis = gp.axes[0];
+                keys.d = xAxis > 0.3 || gp.buttons[15].pressed; 
+                keys.a = xAxis < -0.3 || gp.buttons[14].pressed; 
+                keys.space = gp.buttons[0].pressed; 
+                if (gp.buttons[2].pressed) keys.q = true;
+                if (gp.buttons[3].pressed) keys.e = true;
+            }
+        }
+
+        window.addEventListener('keydown', (e) => {
+            const key = e.key.toLowerCase();
+            if (key === 'd') keys.d = true;
+            if (key === 'a') keys.a = true;
+            if (key === ' ' || e.key === 'Spacebar') { keys.space = true; e.preventDefault(); }
+            if (key === 'q') keys.q = true;
+            if (key === 'e') keys.e = true;
+        });
+
+        window.addEventListener('keyup', (e) => {
+            const key = e.key.toLowerCase();
+            if (key === 'd') keys.d = false;
+            if (key === 'a') keys.a = false;
+            if (key === ' ' || e.key === 'Spacebar') keys.space = false;
+            if (key === 'q') keys.q = false;
+            if (key === 'e') keys.e = false;
+        });
+
+        function gameLoop() {
+            updateGamepad();
+            player.update();
+            
+            for (let i = projectiles.length - 1; i >= 0; i--) {
+                projectiles[i].update();
+                if (!projectiles[i].active) projectiles.splice(i, 1);
+            }
+            
+            handleCollisions();
+
+            let offsetX = player.x - VIEWPORT_WIDTH / 3;
+            if (offsetX < 0) offsetX = 0; 
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            drawBackground(offsetX);
+            drawPlatforms(offsetX);
+            drawCollectibles(offsetX);
+            
+            projectiles.forEach(p => p.draw(offsetX));
+            player.draw(offsetX);
+
+            requestAnimationFrame(gameLoop);
+        }
+
+        spriteSheet.onload = () => {
+            gameLoop();
+        };
+    </script>
+</body>
+</html>

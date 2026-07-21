@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Maya Boy - 2D Jump & Run Prototyp</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: #111;
+            color: #fff;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+        h1 {
+            margin: 5px 0;
+            font-size: 1.5rem;
+            color: #ffd700;
+            text-shadow: 2px 2px #000;
+        }
+        #game-container {
+            position: relative;
+            width: 800px;
+            height: 450px;
+            border: 4px solid #5c4033;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.7);
+            background: #1a1a1a;
+        }
+        canvas {
+            display: block;
+            background: linear-gradient(to bottom, #4a3b2c, #2a2015);
+        }
+        #ui-overlay {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            font-family: monospace;
+            font-size: 16px;
+            color: #fff;
+            background: rgba(0,0,0,0.5);
+            padding: 5px 10px;
+            border-radius: 5px;
+            pointer-events: none;
+        }
+        #controls-info {
+            margin-top: 10px;
+            font-size: 0.9rem;
+            color: #aaa;
+            text-align: center;
+            max-width: 800px;
+            background: rgba(255,255,255,0.05);
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #333;
+        }
+        .key {
+            background: #333;
+            border: 1px solid #fff;
+            border-radius: 3px;
+            padding: 1px 6px;
+            color: #ffd700;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Maya Boy Adventure (Prototyp)</h1>
+    
+    <div id="game-container">
+        <canvas id="gameCanvas" width="800" height="450"></canvas>
+        <div id="ui-overlay">
+            Status: <span id="player-state" style="color: #ffd700;">IDLE</span><br>
+            Score: <span id="player-score" style="color: #00ff00;">0</span>
+        </div>
+    </div>
+
+    <div id="controls-info">
+        <strong>Steuerung:</strong> <span class="key">A</span> / <span class="key">D</span> Gehen | <span class="key">Space</span> Springen | <span class="key">Q</span> Projektil werfen | <span class="key">E</span> Nahkampf-Attacke / Benutzen <br>
+        <em>Unterstützt auch Standard-Gamepad / Controller (D-Pad/Stick zum Bewegen, Süd-Button zum Springen, West-Button für Q, Nord-Button für E).</em>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const stateDisplay = document.getElementById('player-state');
+        const scoreDisplay = document.getElementById('player-score');
+
+        // Da wir das hochgeladene Sprite-Sheet nicht direkt manipulieren können oder eine feste URL voraussetzen,
+        // erstellen wir einen eleganten prozeduralen/gepixelten Platzhalter-Generator für das Sprite-Sheet.
+        // Falls Sie das echte Bild nutzen möchten, ersetzen Sie 'spriteSheet.src' einfach durch den lokalen Pfad.
+        const spriteSheet = new Image();
+        
+        // Erzeuge ein dynamisches Pixel-Art Sprite Sheet für die Demo
+        function generatePlaceholderSprites() {
+            const buffer = document.createElement('canvas');
+            buffer.width = 600;
+            buffer.height = 500;
+            const bCtx = buffer.getContext('2d');
+            
+            const states = ['idle', 'walk', 'run', 'jump', 'throw', 'attack'];
+            states.forEach((state, row) => {
+                for(let frame = 0; frame < 6; frame++) {
+                    let x = frame * 60 + 15;
+                    let y = row * 70 + 15;
+                    
+                    // Zeichne einen stilisierten Maya-Jungen (Pixel-Look)
+                    bCtx.fillStyle = '#d2b48c'; // Hautfarbe
+                    bCtx.fillRect(x + 10, y + 15, 20, 20); // Kopf
+                    
+                    // Großer grüner Federschmuck (Typisch Maya / Wonderboy-Stil)
+                    bCtx.fillStyle = '#00aa44';
+                    bCtx.fillRect(x + 5, y, 30, 15);
+                    bCtx.fillStyle = '#00ff66';
+                    bCtx.fillRect(x + 10, y + 5, 20, 8);
+                    
+                    // Roter Haarreif / Stirnband
+                    bCtx.fillStyle = '#cc0000';
+                    bCtx.fillRect(x + 9, y + 13, 22, 3);
+
+                    // Augen
+                    bCtx.fillStyle = '#000';
+                    bCtx.fillRect(x + 22, y + 20, 3, 3);
+                    
+                    // Kleid / Lendenschurz (Türkis/Gold)
+                    bCtx.fillStyle = '#008080';
+                    bCtx.fillRect(x + 8, y + 35, 24, 15);
+                    bCtx.fillStyle = '#ffd700';
+                    bCtx.fillRect(x + 12, y + 42, 16, 4);
+                    
+                    // Beine/Arme mit leichter Animation je nach Frame
+                    bCtx.fillStyle = '#d2b48c';
+                    let animOffset = Math.sin(frame + row) * 4;
+                    if (state === 'walk' || state === 'run') {
+                        bCtx.fillRect(x + 10, y + 50, 6, 10 + animOffset);
+                        bCtx.fillRect(x + 24, y + 50, 6, 10 - animOffset);
+                    } else if (state === 'jump') {
+                        bCtx.fillRect(x + 8, y + 48, 6, 8);
+                        bCtx.fillRect(x + 26, y + 48, 6, 8);
+                    } else {
+                        bCtx.fillRect(x + 12, y + 50, 6, 12);
+                        bCtx.fillRect(x + 22, y + 50, 6, 12);
+                    }
+                    
+                    // Spezifische Posen-Details
+                    bCtx.fillStyle = '#ffd700';
+                    if (state === 'attack') {
+                        // Schwingt eine Keule / Obsidianschwert (Macuahuitl)
+                        bCtx.fillStyle = '#5c4033';
+                        bCtx.fillRect(x + 28 + (frame * 2), y + 25 - (frame * 2), 6, 20);
+                        bCtx.fillStyle = '#000'; // Obsidian Klingen
+                        bCtx.fillRect(x + 26 + (frame * 2), y + 28 - (frame * 2), 2, 14);
+                    } else if (state === 'throw') {
+                        // Hält eine Jade-Kugel
+                        bCtx.fillStyle = '#00ffaa';
+                        bCtx.beginPath();
+                        bCtx.arc(x + 32, y + 25 - (frame * 2), 6, 0, Math.PI*2);
+                        bCtx.fill();
+                    }
+                }
+            });
+            return buffer.toDataURL();
+        }
+        
+        spriteSheet.src = generatePlaceholderSprites();
+
+        // Spielvariablen & Konstanten
+        const GRAVITY = 0.5;
+        const VIEWPORT_WIDTH = 800;
+        const VIEWPORT_HEIGHT = 450;
+        
+        let score = 0;
+
+        // Tastatur-Input State
+        const keys = {
+            a: false,
+            d: false,
+            space: false,
+            q: false,
+            e: false
+        };
+
+        // Projektil-Klasse (Jade-Kugeln)
+        class Projectile {
+            constructor(x, y, direction) {
+                this.x = x;
+                this.y = y;
+                this.vx = direction * 8;
+                this.vy = -3; // Leichter Bogenwurf
+                this.radius = 6;
+                this.active = true;
+            }
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
+                this.vy += 0.2; // Schwerkraft auf Projektil
+                if (this.y > VIEWPORT_HEIGHT || this.x < 0 || this.x > 3000) {
+                    this.active = false;
+                }
+            }
+            draw(offsetX) {
+                ctx.save();
+                ctx.beginPath();
+                ctx.arc(this.x - offsetX, this.y, this.radius, 0, Math.PI * 2);
+                // Schimmernder Maya-Jade Effekt
+                let gradient = ctx.createRadialGradient(this.x - offsetX, this.y, 1, this.x - offsetX, this.y, this.radius);
+                gradient.addColorStop(0, '#ffffff');
+                gradient.addColorStop(0.4, '#00ffaa');
+                gradient.addColorStop(1, '#006644');
+                ctx.fillStyle = gradient;
+                ctx.shadowColor = '#00ffaa';
+                ctx.shadowBlur = 10;
+                ctx.fill();
+                ctx.restore();
+            }
+        }
+
+        // Spieler-Objekt
+        const player = {
+            x: 100,
+            y: 300,
+            width: 40,
+            height: 65,
+            vx: 0,
+            vy: 0,
+            isGrounded: false,
+            facingRight: true,
+            state: 'IDLE', // IDLE, WALK, RUN, JUMP, THROW, ATTACK
+            
+            // Sprite Animation Settings
+            frameIndex: 0,
+            tickCount: 0,
+            ticksPerFrame: 6,
+            
+            // Attack States
+            actionTimer: 0,
+            
+            update() {
+                // Horizontaler Movement Input
+                let moveSpeed = keys.d ? 4 : (keys.a ? -4 : 0);
+                
+                // Sprint Logik falls gewünscht (Doppelte Geschwindigkeit bei 'Run')
+                if (moveSpeed !== 0) {
+                    this.vx = moveSpeed;
+                    this.facingRight = moveSpeed > 0;
+                    if (this.isGrounded) this.state = 'WALK';
+                } else {
+                    this.vx *= 0.8; // Reibung
+                    if (Math.abs(this.vx) < 0.1) this.vx = 0;
+                    if (this.isGrounded && this.actionTimer <= 0) this.state = 'IDLE';
+                }
+
+                // Sprung Logik
+                if (keys.space && this.isGrounded) {
+                    this.vy = -12;
+                    this.isGrounded = false;
+                    this.state = 'JUMP';
+                }
+
+                // Action Overrides (Gewinnen Priorität über Walk/Idle)
+                if (this.actionTimer > 0) {
+                    this.actionTimer--;
+                } else {
+                    if (keys.q) {
+                        this.state = 'THROW';
+                        this.actionTimer = 20; // 20 Frames Animation blockieren
+                        projectiles.push(new Projectile(this.x + (this.facingRight ? 30 : 10), this.y + 20, this.facingRight ? 1 : -1));
+                        keys.q = false; // Trigger einmalig abfangen
+                    } else if (keys.e) {
+                        this.state = 'ATTACK';
+                        this.actionTimer = 25;
+                        keys.e = false;
+                        // Prüfe Nahkampftreffer an Sammelobjekten
+                        checkMeleeHit();
+                    }
+                }
+
+                if (!this.isGrounded) {
+                    this.state = 'JUMP';
+                }
+
+                // Schwerkraft anwenden
+                this.vy += GRAVITY;
+                
+                this.x += this.vx;
+                this.y += this.vy;
+
+                // Level-Grenzen
+                if (this.x < 0) this.x = 0;
+
+                // Animation Tick Management
+                this.tickCount++;
+                if (this.tickCount > this.ticksPerFrame) {
+                    this.tickCount = 0;
+                    this.frameIndex = (this.frameIndex + 1) % 6; // Jede Sequenz hat 6 Frames in unserem Generator
+                }
+
+                // UI Status Update
+                stateDisplay.innerText = this.state;
+            },
+
+            draw(offsetX) {
+                // Bestimme die Reihe im Sprite Sheet basierend auf dem Status
+                let row = 0;
+                switch(this.state) {
+                    case 'IDLE': row = 0; break;
+                    case 'WALK': row = 1; this.ticksPerFrame = 6; break;
+                    case 'RUN': row = 2; this.ticksPerFrame = 4; break;
+                    case 'JUMP': row = 3; break;
+                    case 'THROW': row = 4; break;
+                    case 'ATTACK': row = 5; break;
+                }
+
+                ctx.save();
+                
+                // Spiegeln wenn der Charakter nach links schaut
+                if (!this.facingRight) {
+                    ctx.translate((this.x - offsetX) * 2 + this.width, 0);
+                    ctx.scale(-1, 1);
+                }
+
+                // Zeichne aus dem generierten Sprite Sheet
+                // Parameter: image, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight
+                ctx.drawImage(
+                    spriteSheet,
+                    this.frameIndex * 60, row * 70, 60, 70,
+                    Math.floor(this.x - offsetX - 10), Math.floor(this.y - 5), 60, 70
+                );
+
+                ctx.restore();
+            }
+        };
+
+        // Liste aktiver Projektile und Level-Elemente
+        const projectiles = [];
+        
+        // Statische Maya Plattformen & Dekorationen im Level (X-Koord geht weit nach rechts)
+        const platforms = [
+            { x: 0, y: 400, width: 900, height: 50, type: 'ground' },
+            { x: 1000, y: 400, width: 1200, height: 50, type: 'ground' },
+            // Stufenpyramiden-Plattformen (Stil vor 1000 Jahren)
+            { x: 300, y: 300, width: 150, height: 30, type: 'stone' },
+            { x: 400, y: 220, width: 150, height: 30, type: 'stone' },
+            { x: 600, y: 150, width: 200, height: 30, type: 'temple' },
+            // Schwebende Dschungel-Plattformen
+            { x: 1150, y: 300, width: 120, height: 20, type: 'wood' },
+            { x: 1350, y: 220, width: 120, height: 20, type: 'wood' },
+            { x: 1550, y: 150, width: 200, height: 30, type: 'stone' },
+            { x: 1850, y: 280, width: 150, height: 20, type: 'stone' }
+        ];
+
+        // Sammelbare Objekte (z.B. Totems, Maya Gold) oder zerstörbare Krüge
+        const collectibles = [
+            { x: 450, y: 180, radius: 15, active: true, type: 'totem' },
+            { x: 680, y: 110, radius: 15, active: true, type: 'gold' },
+            { x: 1400, y: 180, radius: 15, active: true, type: 'totem' },
+            { x: 1650, y: 100, radius: 20, active: true, type: 'shrine' } // Altar/Shrine zum Aktivieren mit 'E'
+        ];
+
+        function checkMeleeHit() {
+            collectibles.forEach(c => {
+                if (c.active && c.type === 'shrine') {
+                    // Berechne Distanz für 'E' Interaktion
+                    let dist = Math.hypot((player.x + player.width/2) - c.x, (player.y + player.height/2) - c.y);
+                    if (dist < 60) {
+                        c.active = false;
+                        score += 500;
+                        scoreDisplay.innerText = score;
+                        alert("Du hast ein 1000 Jahre altes Maya-Heiligtum aktiviert! +500 Punkte.");
+                    }
+                }
+            });
+        }
+
+        // Kollisionsabfrage
+        function handleCollisions() {
+            player.isGrounded = false;
+
+            platforms.forEach(p => {
+                // AABB vs AABB
+                if (player.x < p.x + p.width &&
+                    player.x + player.width > p.x &&
+                    player.y + player.height > p.y &&
+                    player.y + player.height - player.vy <= p.y + 10) {
+                    
+                    // Steht auf der Plattform
+                    if (player.vy > 0) {
+                        player.isGrounded = true;
+                        player.vy = 0;
+                        player.y = p.y - player.height;
+                    }
+                }
+            });
+
+            // Kollision mit Collectibles via Projektil oder Berührung
+            collectibles.forEach(c => {
+                if (!c.active) return;
+
+                // Berührung durch Spieler
+                let distToPlayer = Math.hypot((player.x + player.width/2) - c.x, (player.y + player.height/2) - c.y);
+                if (distToPlayer < c.radius + player.width/2) {
+                    if (c.type !== 'shrine') {
+                        c.active = false;
+                        score += 100;
+                        scoreDisplay.innerText = score;
+                    }
+                }
+
+                // Treffer durch Wurfwaffe
+                projectiles.forEach(p => {
+                    let distToProj = Math.hypot(p.x - c.x, p.y - c.y);
+                    if (distToProj < c.radius + p.radius && c.type !== 'shrine') {
+                        c.active = false;
+                        p.active = false;
+                        score += 150; // Bonuspunkte für Fernkampftreffer
+                        scoreDisplay.innerText = score;
+                    }
+                });
+            });
+
+            // Sturz in den Abgrund verhindern/zurücksetzen
+            if (player.y > VIEWPORT_HEIGHT + 100) {
+                player.x = 100;
+                player.y = 200;
+                player.vy = 0;
+                score = Math.max(0, score - 50);
+                scoreDisplay.innerText = score;
+            }
+        }
+
+        // Hintergrund im präkolumbianischen südamerikanischen Stil zeichnen
+        function drawBackground(offsetX) {
+            // Himmel bei Dämmerung / Tropen-Atmosphäre
+            let skyGrad = ctx.createLinearGradient(0, 0, 0, VIEWPORT_HEIGHT);
+            skyGrad.addColorStop(0, '#bd6a3b'); // Warmes Terrakotta / Orange
+            skyGrad.addColorStop(0.6, '#5c3a21'); // Tiefes Braun
+            skyGrad.addColorStop(1, '#20150c');
+            ctx.fillStyle = skyGrad;
+            ctx.fillRect(0, 0, VIEWPORT_WIDTH, VIEWPORT_HEIGHT);
+
+            // Ferne Silhouette einer großen Stufenpyramide (Tikal / Palenque Stil)
+            ctx.fillStyle = '#3a2b1d';
+            ctx.beginPath();
+            let pyrX = 400 - offsetX * 0.2; // Parallax-Effekt
+            ctx.moveTo(pyrX, 400);
+            ctx.lineTo(pyrX + 50, 300);
+            ctx.lineTo(pyrX + 70, 300);
+            ctx.lineTo(pyrX + 110, 220);
+            ctx.lineTo(pyrX + 150, 220);
+            ctx.lineTo(pyrX + 190, 300);
+            ctx.lineTo(pyrX + 210, 300);
+            ctx.lineTo(pyrX + 260, 400);
+            ctx.fill();
+
+            // Tempelkrone auf der Pyramide
+            ctx.fillStyle = '#2d2015';
+            ctx.fillRect(pyrX + 115, 195, 30, 25);
+
+            // Dschungel-Silhouetten im Hintergrund
+            ctx.fillStyle = '#1e2d1a';
+            for (let i = 0; i < 12; i++) {
+                let treeX = (i * 120) - (offsetX * 0.4);
+                ctx.beginPath();
+                ctx.arc(treeX, 380, 40, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.fillRect(treeX - 5, 370, 10, 40);
+            }
+        }
+
+        // Plattformen rendern (Maya Stein-Textur angedeutet)
+        function drawPlatforms(offsetX) {
+            platforms.forEach(p => {
+                ctx.save();
+                
+                // Muted/Historisches Farbschema: Moosiger Kalkstein
+                if (p.type === 'ground' || p.type === 'stone') {
+                    ctx.fillStyle = '#4a5343'; // Graugrün
+                    ctx.fillRect(p.x - offsetX, p.y, p.width, p.height);
+                    
+                    // Relief / Stufen-Muster hinzufügen
+                    ctx.strokeStyle = '#2d3328';
+                    ctx.lineWidth = 2;
+                    ctx.strokeRect(p.x - offsetX, p.y, p.width, p.height);
+                    
+                    // Maya Glyphen / Linien Andeutung
+                    ctx.fillStyle = '#3a4134';
+                    for(let step = p.x; step < p.x + p.width; step += 40) {
+                        ctx.fillRect(step - offsetX + 5, p.y + 5, 5, p.height - 10);
+                    }
+                } else if (p.type === 'temple') {
+                    ctx.fillStyle = '#8c7853'; // Antikes Goldgelb/Sandstein
+                    ctx.fillRect(p.x - offsetX, p.y, p.width, p.height);
+                    ctx.strokeStyle = '#5c4d33';
+                    ctx.strokeRect(p.x - offsetX, p.y, p.width, p.height);
+                } else {
+                    ctx.fillStyle = '#5c4033'; // Holz
+                    ctx.fillRect(p.x - offsetX, p.y, p.width, p.height);
+                }
+                ctx.restore();
+            });
+        }
+
+        // Sammelobjekte zeichnen
+        function drawCollectibles(offsetX) {
+            collectibles.forEach(c => {
+                if (!c.active) return;
+                ctx.save();
+                ctx.beginPath();
+                ctx.arc(c.x - offsetX, c.y, c.radius, 0, Math.PI * 2);
+
+                if (c.type === 'totem') {
+                    ctx.fillStyle = '#cc5500'; // Kupfer / Terrakotta Totem
+                    ctx.fill();
+                    // Gesicht angedeutet
+                    ctx.fillStyle = '#000';
+                    ctx.fillRect(c.x - offsetX - 4, c.y - 4, 3, 3);
+                    ctx.fillRect(c.x - offsetX + 2, c.y - 4, 3, 3);
+                    ctx.fillRect(c.x - offsetX - 4, c.y + 2, 8, 2);
+                } else if (c.type === 'gold') {
+                    ctx.fillStyle = '#ffd700'; // Reines Maya Gold
+                    ctx.shadowColor = '#ffd700';
+                    ctx.shadowBlur = 8;
+                    ctx.fill();
+                } else if (c.type === 'shrine') {
+                    ctx.fillStyle = '#008080'; // Großes Jade-Zentrum
+                    ctx.fillRect(c.x - offsetX - 15, c.y - 20, 30, 40);
+                    ctx.fillStyle = '#ffd700';
+                    ctx.strokeRect(c.x - offsetX - 15, c.y - 20, 30, 40);
+                }
+                ctx.restore();
+            });
+        }
+
+        // Gamepad / Controller API Support
+        function updateGamepad() {
+            const gamepads = navigator.getGamepads ? navigator.getGamepads() : [];
+            const gp = gamepads[0]; // Nutze den ersten erkannten Controller
+            
+            if (gp) {
+                // Analog-Stick oder Steuerkreuz (D-Pad)
+                const xAxis = gp.axes[0];
+                keys.d = xAxis > 0.3 || gp.buttons[15].pressed; // Rechts
+                keys.a = xAxis < -0.3 || gp.buttons[14].pressed; // Links
+                
+                // Buttons abfragen
+                keys.space = gp.buttons[0].pressed; // A / Süd-Button (Springen)
+                
+                if (gp.buttons[2].pressed) { // X / West-Button (Werfen)
+                    keys.q = true;
+                }
+                if (gp.buttons[3].pressed) { // Y / Nord-Button (Attacke)
+                    keys.e = true;
+                }
+            }
+        }
+
+        // Keyboard Event Listener
+        window.addEventListener('keydown', (e) => {
+            const key = e.key.toLowerCase();
+            if (key === 'd') keys.d = true;
+            if (key === 'a') keys.a = true;
+            if (key === ' ' || e.key === 'Spacebar') { keys.space = true; e.preventDefault(); }
+            if (key === 'q') keys.q = true;
+            if (key === 'e') keys.e = true;
+        });
+
+        window.addEventListener('keyup', (e) => {
+            const key = e.key.toLowerCase();
+            if (key === 'd') keys.d = false;
+            if (key === 'a') keys.a = false;
+            if (key === ' ' || e.key === 'Spacebar') keys.space = false;
+            if (key === 'q') keys.q = false;
+            if (key === 'e') keys.e = false;
+        });
+
+        // Main Game Loop
+        function gameLoop() {
+            // 1. Inputs verarbeiten (Keyboard + Gamepad)
+            updateGamepad();
+            
+            // 2. Zustand aktualisieren
+            player.update();
+            
+            // Projektile updaten
+            for (let i = projectiles.length - 1; i >= 0; i--) {
+                projectiles[i].update();
+                if (!projectiles[i].active) projectiles.splice(i, 1);
+            }
+            
+            // Kollisionen berechnen
+            handleCollisions();
+
+            // Camera/Viewport Offset berechnen (Folgt dem Spieler flüssig)
+            let offsetX = player.x - VIEWPORT_WIDTH / 3;
+            if (offsetX < 0) offsetX = 0; // Klemmen am linken Rand
+
+            // 3. Zeichnen
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            drawBackground(offsetX);
+            drawPlatforms(offsetX);
+            drawCollectibles(offsetX);
+            
+            // Projektile zeichnen
+            projectiles.forEach(p => p.draw(offsetX));
+            
+            // Spieler zeichnen
+            player.draw(offsetX);
+
+            requestAnimationFrame(gameLoop);
+        }
+
+        // Start des Loops, sobald das Skript bereit ist
+        spriteSheet.onload = () => {
+            gameLoop();
+        };
+    </script>
+</body>
+</html>
