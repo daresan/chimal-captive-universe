@@ -1,4 +1,4 @@
-# Maya Boy – Curse of the Vulture
+# Chimal – Captive Universe
 
 Ein lokaler 2D-Plattformer-Prototyp im Geist klassischer Side-Scroller, mit einem eigenständigen Maya-Abenteurer, Canvas-Rendering, Parallax-Landschaft sowie Keyboard- und Xbox-Gamepad-Steuerung.
 
