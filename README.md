@@ -12,6 +12,19 @@ python -m http.server 8080
 
 Danach `http://localhost:8080` öffnen. Alternativ funktioniert in vielen Browsern auch ein Doppelklick auf `index.html`.
 
+Der Level-Editor ist unter `http://localhost:8080/level-editor.html` erreichbar.
+
+## Level-Editor
+
+- Levelelemente und Spawnpunkte besitzen getrennte Ebenen und dürfen auf demselben Rasterfeld liegen.
+- Linksklick platziert das aktive Werkzeug oder wählt ein vorhandenes Objekt; Rechtsklick löscht nur auf der aktiven Ebene.
+- Eigenschaften wie Position, Breite und Höhe lassen sich numerisch bearbeiten.
+- Undo/Redo, Browser-Speicher, JSON-Import und JSON-Export sind integriert.
+- **Im Spiel testen** übergibt das aktuelle Level an `index.html?editorLevel=1`.
+- Spieler- und Gegner-Sprites lassen sich über Pfad, Framegröße, Frameanzahl, Animationsreihe und Skalierung konfigurieren.
+
+Das JSON-Format enthält `terrain`, `spawns` und `sprites` getrennt. Dadurch kann ein Spawnpunkt unabhängig von einem Geländeelement auf derselben Koordinate existieren.
+
 ## Steuerung
 
 | Aktion | Tastatur | Xbox-Gamepad |
@@ -47,8 +60,10 @@ Die generierte Chroma-Key-Quelle liegt aus Gründen der Nachvollziehbarkeit unte
 ## Technik und Struktur
 
 - `index.html` – vollständiges Spiel ohne Build-Schritt oder externe Bibliotheken
+- `level-editor.html` – rasterbasierter Level- und Sprite-Konfigurationseditor
 - `assets/` – Runtime-Sheet und Generierungsquelle
 - `tools/build_sprite.py` – deterministische Sheet-Normalisierung (Pillow)
+- `tools/build_enemy_sprites.py` – erzeugt fünf transparente Gegner-Sheets aus dem generierten Atlas
 - `static_maya_game_v1.html`, `static_maya_game_v2.html` – historische Prototypen
 
 ## Git-Workflow
