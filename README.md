@@ -51,6 +51,8 @@ Das JSON-Format enthält `terrain`, `spawns` und `sprites` getrennt. Dadurch kan
 | Angriff/Benutzen | E | X |
 | Werfen | Tab | Y |
 
+Gehen und Rennen besitzen bewusst deutlich unterschiedliche Geschwindigkeiten. Ein Sprung aus dem Lauf ist höher und wesentlich weiter als ein Sprung aus dem Stand oder Gehen. Geworfene Feuerkugeln folgen einem kurzen Bogen und können einmal vom Boden abprallen.
+
 ## Spielinhalt
 
 - Levelroute: Homevillage → Dschungel → Mountainroad → Mountain → MountainTop.
