@@ -124,3 +124,9 @@ Die Prompts beschreiben Ziele und Entscheidungen, sind aber kein deterministisch
 > Durch die Umstellung auf grafische Spielelemente ging die Eigenschaft verloren, dass übereinanderliegende Reihen desselben Typs ohne sichtbare „Schichttorte“ verschmelzen. Jedes Objekt benötigt deshalb ein weiteres Bild, das verwendet wird, wenn es nicht das oberste Element seiner Säule oder Bodenreihe ist.
 
 **Ergebnis:** Ein zweiter, stilistisch passender 5×3-Atlas wurde mit dem eingebauten OpenAI-Bildworkflow erzeugt, per Chroma-Key freigestellt und in 15 Füllsegmente zerlegt. Diese besitzen keine obere Gras-, Moos-, Dach-, Plattform- oder Reliefkrone. Editor und Runtime prüfen identischen Typ, unmittelbare vertikale Nachbarschaft und horizontale Überlappung. Innenliegende Elemente verwenden automatisch das Füllbild, während nur das oberste Element sein dekoratives Abschlussbild behält.
+
+## 19. Ziel erst nach allen Bossen und verlässliche Folgelevel-IDs
+
+> Nach dem Sieg über alle Cursed Vultures darf die alte Abschlussmeldung nicht sofort erscheinen. Chimal muss anschließend den Zielpunkt erreichen – auch wenn er ihn zuvor schon überquert hatte. Ein am Ziel eingetragenes Folgelevel wie `Level_2` soll geladen werden; existiert es noch nicht, muss mindestens „Level not found“ angezeigt werden, statt unbemerkt zu Level 1 zurückzukehren.
+
+**Ergebnis:** Der direkte Boss-Siegpfad wurde entfernt. Der Zielstein besitzt nun die Zustände gesperrt, Freigabe abwarten und aktiv; steht Chimal beim letzten Boss-Tod bereits darauf, muss er ihn verlassen und neu betreten. Der Editor bietet eine explizite, sichere und groß-/kleinschreibungssensitive Level-ID, sodass `Level_2` exakt mit der Folgelevel-ID am Ziel übereinstimmen kann. **Weiter** lädt nur ein valides Browser-Level oder `levels/ID.json`; bei einem fehlenden Level bleibt das Finish-Fenster geöffnet und zeigt `Level not found: Level_2` an.
