@@ -40,6 +40,8 @@ Vor dem Spielstart erscheint ein Startdialog für Spielername und Ausgabeformat.
 - Der Horizont kann als Außenbereich mit Tag/Nacht und Wetter (klar, wolkig, Regen oder Schnee) oder als dunkler Höhlen-Innenraum konfiguriert werden.
 - Übereinanderliegende Boden- und Steinreihen verschmelzen visuell; nur die oberste Reihe erhält Gras beziehungsweise eine helle Steinkante.
 - Eine `boss_arena` markiert den zulässigen Bewegungs- und Kampfbereich des Cursed Vulture.
+- Es dürfen mehrere Boss-Arenen existieren. Jede Arena belegt exakt einen 1280×720-Abschnitt; ein Cursed Vulture wird anhand seines Spawnpunkts seiner Arena zugeordnet.
+- Zielsteine besitzen optional eine `Folgelevel-ID`. **Browser speichern** legt das Level zusätzlich unter einer aus dem Levelnamen erzeugten ID ab; alternativ können Folgelevels als `levels/ID.json` bereitgestellt werden.
 - Undo/Redo, Browser-Speicher, JSON-Import und JSON-Export sind integriert.
 - **Im Spiel testen** übergibt das aktuelle Level an `index.html?editorLevel=1`.
 - Spieler- und Gegner-Sprites lassen sich über Pfad, Framegröße, Frameanzahl, Animationsreihe und Skalierung konfigurieren.
@@ -56,6 +58,8 @@ Das JSON-Format enthält `terrain`, `spawns` und `sprites` getrennt. Dadurch kan
 - Spieler und laufende Gegner kollidieren mit Hindernissen. Sie dürfen von Kanten auf tiefer gelegene Plattformen fallen und sterben erst, wenn sie ohne Landung das untere Levelende erreichen; fliegende Gegner sind davon ausgenommen.
 - Der Boss behält seine Blickrichtung in der Nähe des Spielers und verwendet im Stillstand die zweite Sprite-Reihe `IDLE_FLOAT`.
 - Bossbewegung und gegenseitige Treffer sind auf die im Editor gesetzte Boss-Arena begrenzt.
+- Nahkampf und Körperkontakt mit Bossen bleiben an deren Arena gebunden. Spieler- und Gegnerprojektile dürfen Arenagrenzen überqueren.
+- HIT und DEATH besitzen sichtbare, zeitlich abgespielte Sequenzen. Gegner verschwinden erst nach ihrer Todesanimation.
 
 ## Steuerung
 
@@ -68,7 +72,14 @@ Das JSON-Format enthält `terrain`, `spawns` und `sprites` getrennt. Dadurch kan
 | Angriff/Benutzen | E | X |
 | Werfen | Tab | Y |
 
-Gehen und Rennen besitzen bewusst deutlich unterschiedliche Geschwindigkeiten. Ein Sprung aus dem Lauf ist höher und wesentlich weiter als ein Sprung aus dem Stand oder Gehen. Geworfene Feuerkugeln folgen einem kurzen Bogen und können einmal vom Boden abprallen.
+Gehen und Rennen besitzen bewusst deutlich unterschiedliche Geschwindigkeiten. Ein Sprung aus dem Lauf ist höher und wesentlich weiter als ein Sprung aus dem Stand oder Gehen. Geworfene Feuerkugeln folgen einem kurzen Bogen, bleiben länger aktiv und können bis zu dreimal vom Boden abprallen.
+
+## Levelabschluss und Kampagne
+
+- Das Besiegen eines Bosses beendet das Level nicht unmittelbar. Bei mehreren Cursed Vultures müssen zuerst alle Bosse besiegt werden.
+- Erst danach wird der Zielstein aktiv. Beim Betreten ertönt eine kurze Fanfare und das Finish-Fenster zählt den Score sichtbar hoch.
+- Pro 1000 in diesem Level verdienten Punkten erhält der Spieler ein zusätzliches Leben beziehungsweise Continue.
+- Ist am Zielstein eine Folgelevel-ID eingetragen, lädt **Weiter** das entsprechende Browser-Level oder `levels/ID.json`. Score, Spielername und verbleibende Leben werden übernommen.
 
 ## Spielinhalt
 
@@ -126,3 +137,4 @@ Die maßgeblichen Nutzer-Prompts und die daraus entstandenen Entwicklungsschritt
 - [SECURITY_AUDIT.md](SECURITY_AUDIT.md) dokumentiert Prüfbereich, reproduzierbare Befehle, Befunde und umgesetzte Schutzmaßnahmen.
 - [DEFAULT_CODEX_PROMPT.md](DEFAULT_CODEX_PROMPT.md) enthält den vereinbarten Standard-Prompt für Git-Workflow, Dokumentationspflege und Prompt-/Ergebnisprotokoll.
 - Importierte Leveldaten werden gegen bekannte Typen und zulässige Werte normalisiert. Importabhängige UI wird mit sicheren DOM-APIs aufgebaut; Spritequellen müssen lokale PNG-Dateien unter `assets/` sein.
+- Folgelevel-IDs erlauben ausschließlich bis zu 60 alphanumerische Zeichen, `_` und `-`. Sie können daher weder externe URLs noch frei gewählte lokale Pfade referenzieren.

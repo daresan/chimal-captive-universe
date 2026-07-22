@@ -88,6 +88,8 @@ Erwartete verbleibende Treffer:
 
 Importierte Objekttypen, Sprite-Namen und Spritewerte dürfen nicht mehr in `innerHTML` interpoliert werden.
 
+Folgelevel-IDs werden auf maximal 60 alphanumerische Zeichen sowie `_` und `-` begrenzt. Der Spiellader liest ausschließlich den zugehörigen Browser-Speicherschlüssel oder `levels/ID.json`; externe URLs und Pfadsegmente werden abgelehnt.
+
 ## Behobene Schwachstelle: manipulierter Levelimport
 
 Vor der Härtung prüfte der Import nur, ob `terrain` und `spawns` Arrays waren. Werte wie Objekttypen und Spritefelder gelangten danach in HTML-Templates. Eine absichtlich manipulierte JSON-Datei konnte dadurch Markup beziehungsweise Script-Handler einschleusen.
