@@ -106,6 +106,8 @@ Die Schutzmaßnahmen sind jetzt:
 - UI-Erzeugung mit `createElement`, `textContent`, `value` und `replaceChildren`
 - Öffnen der Spielvorschau mit `noopener`
 - Spielername und Auflösungswahl werden mit DOM-APIs aufgebaut; der Name gelangt ausschließlich über `textContent` in die Oberfläche.
+- Kampagnen-, Level-, Ausgangs- und Entrypoint-IDs sind auf 60 Zeichen sowie `[A-Za-z0-9_-]` begrenzt; Kampagnenlisten werden vor Verarbeitung auf 100 Einträge beschränkt.
+- Level-Manager, Leveltitel und Ladefehler verwenden für importierte Namen und IDs ausschließlich sichere DOM-Textzuweisung. Browsergespeicherte Vorschau-Level werden vor ihrer Darstellung erneut kanonisch normalisiert.
 
 ## Restrisiken
 

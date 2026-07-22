@@ -45,6 +45,10 @@ Vor dem Spielstart erscheint ein Startdialog für Spielername und Ausgabeformat.
 - Eine `boss_arena` markiert den zulässigen Bewegungs- und Kampfbereich des Cursed Vulture.
 - Es dürfen mehrere Boss-Arenen existieren. Jede Arena belegt exakt einen 1280×720-Abschnitt; ein Cursed Vulture wird anhand seines Spawnpunkts seiner Arena zugeordnet.
 - Zielsteine besitzen optional eine `Folgelevel-ID`. Jedes Level kann dafür eine explizite, groß-/kleinschreibungssensitive `Level-ID` wie `Level_2` erhalten. **Browser speichern** legt es exakt unter dieser ID ab; bleibt das Feld leer, wird weiterhin eine ID aus dem Levelnamen erzeugt. Alternativ können Folgelevels als `levels/ID.json` bereitgestellt werden.
+- Levelname und Level-ID sind unabhängig: Der Name wird beim Spielstart als Einblendung angezeigt, die ID dient ausschließlich dem technischen Laden und Verknüpfen.
+- Der **Level-Manager** zeigt browsergespeicherte Level als Miniaturblöcke. Die Kampagnenreihenfolge lässt sich per Drag-and-drop ändern; alle Zielsteine werden beim Bestätigen automatisch mit dem jeweils nächsten Level verbunden.
+- Ein Level kann mehrere nummerierte Spieler-Einstiegspunkte (`start_1`, `start_2`, …) besitzen. Neue Spieler-Spawns erhalten fortlaufende IDs, die in den Eigenschaften angepasst werden können.
+- `Hidden Door` erzeugt einen verborgenen Ausgang. Er kann im Editor oder Level-Manager auf eine beliebige sichere Level-ID und einen konkreten Einstiegspunkt zeigen – auch zurück in dasselbe Level. Im Spiel wird die Tür mit **E** benutzt.
 - Undo/Redo, Browser-Speicher, JSON-Import und JSON-Export sind integriert.
 - **Im Spiel testen** übergibt das aktuelle Level an `index.html?editorLevel=1`.
 - Spieler- und Gegner-Sprites lassen sich über Pfad, Framegröße, Frameanzahl, Animationsreihe und Skalierung konfigurieren.
@@ -84,6 +88,7 @@ Gehen und Rennen besitzen bewusst deutlich unterschiedliche Geschwindigkeiten. E
 - Erst danach wird der Zielstein aktiv. Befindet sich Chimal beim letzten Boss-Tod bereits darauf, muss er den Zielstein zunächst verlassen und neu betreten. Dann ertönt eine kurze Fanfare und das Finish-Fenster zählt den Score sichtbar hoch.
 - Pro 1000 in diesem Level verdienten Punkten erhält der Spieler ein zusätzliches Leben beziehungsweise Continue.
 - Ist am Zielstein eine Folgelevel-ID eingetragen, lädt **Weiter** das entsprechende Browser-Level oder `levels/ID.json`. Die ID muss einschließlich Groß-/Kleinschreibung übereinstimmen. Fehlt das Level, zeigt das Finish-Fenster `Level not found: ID` an und bleibt geöffnet, statt still Level 1 zu laden. Score, Spielername und verbleibende Leben werden nur bei erfolgreichem Laden übernommen.
+- In einer gespeicherten Kampagne wird das Ziel-Level aus der Reihenfolge des Level-Managers abgeleitet. Der gewünschte Einstiegspunkt des nächsten Levels bleibt pro Zielstein wählbar; HiddenDoors besitzen vollständig frei konfigurierbare Ziel-Level- und Einstiegspunkt-Verbindungen.
 
 ## Spielinhalt
 
