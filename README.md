@@ -26,6 +26,7 @@ Vor dem Spielstart erscheint ein Startdialog für Spielername und Ausgabeformat.
 - Themes werden links als Paletten gewählt: Village, Dschungel, Mountain, Tempel, Dungeon und Gameplay können innerhalb desselben Levels beliebig kombiniert werden.
 - Linksklick und Ziehen malt das aktive Element fortlaufend ins Raster; jedes Feld wird pro Malvorgang höchstens einmal belegt. Rechtsklick löscht nur auf der aktiven Ebene.
 - Vier Bearbeitungsmodi trennen Zeichnen, Auswählen, rasterweises Verschieben und Löschen. Terrain, Spawns und Hintergrundobjekte bleiben getrennt wählbar.
+- Im Löschmodus bestimmt das Objekt unter dem ersten Mausklick den Typ des Löschstrichs. Solange die linke Maustaste gehalten wird, werden beim Darüberziehen ausschließlich weitere Objekte desselben Typs und derselben Ebene gelöscht. Der gesamte Strich ist ein einzelner Undo-Schritt.
 - Hintergrundobjekte können zusätzlich nach Z-Depth 0–5 gefiltert, umrandet, ausgewählt, verschoben, skaliert oder gelöscht werden.
 - **Level leeren** erzeugt einen vollständig leeren Level ohne Terrain, Spawns, Katalogobjekte oder Theme-Zuweisungen; **Neu** erzeugt weiterhin die kleine Startvorlage.
 - Eigenschaften wie Position, Breite und Höhe lassen sich numerisch bearbeiten.

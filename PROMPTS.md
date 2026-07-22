@@ -106,3 +106,9 @@ Die Prompts beschreiben Ziele und Entscheidungen, sind aber kein deterministisch
 > Die Bewegungssequenz der Cursed Vultures wirkt weiterhin nicht wie Fliegen, sondern wie eine „Störung in der Matrix“. Der letzte korrekte Commit soll als Vergleich dienen.
 
 **Ergebnis:** Das Boss-Sheet selbst war unverändert. Die mit Version 6 eingeführte Frameberechnung multiplizierte jedoch eine bereits zeitbasierte Phase erneut mit der Frameanzahl und beschleunigte normale Animationen von ungefähr 6–9 auf 36–54 Framewechsel pro Sekunde. Außerdem enthält die Bewegungsreihe in den Frames 4–5 bereits die Wurfattacke. Normale Animationen verwenden wieder die ursprüngliche Zeitformel; der Bewegungszustand des Vultures durchläuft ausschließlich die vier zusammenhängenden Flugframes 0–3. `IDLE_FLOAT`, HIT und DEATH bleiben getrennt erhalten.
+
+## 16. Typgebundener Löschstrich im Level-Editor
+
+> Im Löschmodus sollen während einer gedrückten Maustaste alle überfahrenen Elemente gelöscht werden, sofern sie denselben Typ besitzen wie das Objekt, das zu Beginn der Aktion unter dem Mauszeiger lag.
+
+**Ergebnis:** Der erste Linksklick im Löschmodus fixiert Objekttyp und aktive Ebene für die Dauer des Löschstrichs. Beim Ziehen werden ausschließlich darunterliegende Objekte mit genau diesem Typ entfernt; andere Typen, überlagerte Layer und beim Hintergrund ein abweichender Z-Filter bleiben unberührt. Der gesamte Löschstrich erzeugt nur einen Undo-Snapshot.
