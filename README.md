@@ -22,7 +22,10 @@ Der Level-Editor ist unter `http://localhost:8080/level-editor.html` erreichbar.
 - Eigenschaften wie Position, Breite und Höhe lassen sich numerisch bearbeiten.
 - Ein Level beginnt bei 1280×720 px. Breite und Höhe lassen sich um exakt eine Bildschirmbreite (1280 px) beziehungsweise Bildschirmhöhe (720 px) vergrößern und wieder reduzieren.
 - Die Minimap zeigt das gesamte Level; ein Klick darauf verschiebt den Arbeitsbereich horizontal und vertikal.
+- Der Navigator besitzt einen Zoomregler von 35–125 %. Der Editier-Viewport bleibt unabhängig von Levelgröße und Zoom innerhalb des verfügbaren Browserfensters und kann in beide Richtungen scrollen.
 - Eine eigene Hintergrundebene bietet einen erweiterbaren Katalog freigestellter Maya-Landschaftsobjekte mit einstellbarer Z-Tiefe und Skalierung.
+- Jeder horizontale 1280-Pixel-Bildschirmabschnitt kann ein eigenes Village-, Jungle-, Mountain-, Temple- oder Dungeon-Theme mit direktem oder weichem Übergang erhalten.
+- Jedes Theme verwendet ein bildschirmfüllendes Landschaftsbild; Tag/Nacht und Wetter werden als dynamische Licht- und Atmosphärenebenen darübergelegt.
 - Pro Bildschirmausschnitt stehen Village-, Dschungel-, Mountain-, Tempel- und Dungeon-Vorlagen bereit.
 - Der Horizont kann als Außenbereich mit Tag/Nacht und Wetter (klar, wolkig, Regen oder Schnee) oder als dunkler Höhlen-Innenraum konfiguriert werden.
 - Übereinanderliegende Boden- und Steinreihen verschmelzen visuell; nur die oberste Reihe erhält Gras beziehungsweise eine helle Steinkante.
@@ -60,6 +63,7 @@ Gehen und Rennen besitzen bewusst deutlich unterschiedliche Geschwindigkeiten. E
 - Lebenspunkte: normale Gegner 1, Priester 2, Boss 3; Spieler 3 HP und 3 Continues.
 - Versteckte Truhen heilen oder verbessern Angriff, Wurf und Block.
 - Mehrschichtige Parallax-Landschaft mit Z-Tiefen, freigestellten Katalog-Sprites, Wetter und Höhlenbeleuchtung.
+- Weltverankerte Parallaxobjekte bleiben an der im Editor gesetzten Bildschirmposition sichtbar und werden je nach Z-Tiefe mit einer näheren, präsenteren Bewegungsrate dargestellt.
 
 ## Sprite-Sheet-Vertrag
 
@@ -79,6 +83,7 @@ Die generierte Chroma-Key-Quelle liegt aus Gründen der Nachvollziehbarkeit unte
 - `index.html` – vollständiges Spiel ohne Build-Schritt oder externe Bibliotheken
 - `level-editor.html` – rasterbasierter Level- und Sprite-Konfigurationseditor
 - `assets/` – Runtime-Sheet und Generierungsquelle
+- `assets/backgrounds/` – fünf bildschirmfüllende Theme-Landschaften
 - `tools/build_sprite.py` – deterministische Sheet-Normalisierung (Pillow)
 - `tools/build_enemy_sprites.py` – erzeugt fünf transparente Gegner-Sheets aus dem generierten Atlas
 - `tools/build_catalog_assets.py` – normalisiert das Cougar-Sheet und erzeugt den transparenten Landschaftskatalog

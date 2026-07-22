@@ -70,3 +70,9 @@ Die Prompts beschreiben Ziele und Entscheidungen, sind aber kein deterministisch
 > Die Behauptungen des Security Audits sollen überprüfbar belegt werden. Anschließend soll die JSON-Import-/DOM-Verarbeitung abgesichert, die Repository-Dokumentation einschließlich Audit und Promptliste in einem neuen Commit aktualisiert und ein Default-Prompt für den etablierten Git- und Dokumentationsworkflow erstellt werden.
 
 **Ergebnis:** Die reproduzierbaren Prüfkommandos und ihre Bewertung stehen in `SECURITY_AUDIT.md`. Der Editor normalisiert importierte und gespeicherte Leveldaten anhand von Allowlists, Grenzen und sicheren lokalen Assetpfaden. Importabhängige Oberflächen werden ohne HTML-Interpolation erzeugt. `DEFAULT_CODEX_PROMPT.md` hält den künftigen Workflow fest.
+
+## 10. Editor-Viewport, Theme-Segmente und präsente Parallaxe
+
+> Der sichtbare Editierbereich darf beim aktuellen Zoom nie höher als das verfügbare Fenster sein und muss über den Navigator vertikal verschiebbar bleiben. Hintergrundelemente sollen präsenter wirken; zusätzlich werden große, detailreiche Landschaftsbilder für Themes, Tageszeiten und Wetter benötigt. Jeder Bildschirmabschnitt soll ein eigenes Theme mit möglichen Übergängen besitzen. Im dritten Bildschirm platzierte Elemente wie Lianenbogen, Ceiba-Baum und Dschungelgruppe müssen beim Spieltest sichtbar sein.
+
+**Ergebnis:** Der Editor-Viewport ist nun korrekt auf den verfügbaren Fensterraum begrenzt und besitzt einen Navigator-Zoom von 35–125 %. Minimap und Raster berücksichtigen Zoom und beide Scrollachsen. Levelversion 4 speichert Theme-Zuweisungen pro horizontalem Bildschirm samt optionalem Blend-Übergang. Fünf neue 1280×720-Landschaften decken Village, Jungle, Mountain, Temple und Dungeon ab; Tageszeit und Wetter bleiben dynamische Laufzeitebenen. Der Fehler bei Katalogobjekten wurde auf eine Vermischung von Welt- und Parallaxkoordinaten zurückgeführt und durch weltverankerte, präsentere Parallaxberechnung korrigiert.

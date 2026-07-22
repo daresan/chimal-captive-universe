@@ -96,6 +96,7 @@ Die Schutzmaßnahmen sind jetzt:
 
 - Normalisierung jedes Imports und gespeicherter LocalStorage-Level
 - Allowlist für Terrain-, Spawn-, Hintergrund- und Sprite-Typen
+- Allowlist für Bildschirm-Themes und Übergangstypen
 - Begrenzte, endliche Zahlenwerte und definierte Maximalgrößen
 - Mengenbegrenzungen gegen triviale Speicher-/Render-Denial-of-Service-Dateien
 - Spritepfade ausschließlich relativ unter `assets/`, ohne `..`, nur als `.png`
