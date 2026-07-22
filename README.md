@@ -44,7 +44,7 @@ Das JSON-Format enthält `terrain`, `spawns` und `sprites` getrennt. Dadurch kan
 
 | Aktion | Tastatur | Xbox-Gamepad |
 |---|---|---|
-| Gehen / Rennen | A/D; nach 0,62 s wird Gehen zu Rennen | Linker Stick bis/über 50 % |
+| Gehen / Rennen | A/D; nach 0,42 s wird Gehen zu Rennen | Linker Stick bis/über 50 % |
 | Ducken | S | Linker Stick nach unten |
 | Springen | Leertaste | A |
 | Block/Schild | Q | B |
@@ -91,3 +91,13 @@ Die generierte Chroma-Key-Quelle liegt aus Gründen der Nachvollziehbarkeit unte
 ## Asset-Hinweis
 
 Die neue Figur wurde mit dem eingebauten OpenAI-Imagegen-Workflow auf einfarbigem Hintergrund erzeugt und lokal zu einem transparenten Pixel-Sheet verarbeitet. Der Charakter ist eine eigenständige Maya-inspirierte Gestaltung und kopiert keine geschützte Spielfigur.
+
+## Credits und Entstehung
+
+**Konzept, kreative Leitung und iterative Anforderungen:** Daresan
+
+**Implementierung, technische Ausarbeitung, Dokumentation und KI-gestützte Asset-Erstellung:** OpenAI Codex, auf Grundlage der Prompts von Daresan
+
+Der Prototyp entstand in einer schrittweisen Mensch–KI-Zusammenarbeit. Daresan definierte Spielidee, Maya-Thema, Figuren, Steuerung, Gegnerverhalten, Levelstruktur sowie die Anforderungen an Sprites und Editor. OpenAI Codex setzte diese Vorgaben im lokalen Projekt um, entwickelte die Canvas-Spielmechanik und den Level-Editor, erzeugte und normalisierte Bildassets, testete die Änderungen und pflegte den Git-Verlauf.
+
+Die maßgeblichen Nutzer-Prompts und die daraus entstandenen Entwicklungsschritte sind zur öffentlichen Nachvollziehbarkeit in [PROMPTS.md](PROMPTS.md) dokumentiert.
