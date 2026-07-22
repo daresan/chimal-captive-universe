@@ -1,5 +1,9 @@
 # Chimal – Captive Universe
 
+Das Spielthema ist eine Hommage an den Roman *Captive Universe* (*Welt im Fels*) von Harry Harrison.
+
+Der Spieler schlüpft in die Rolle von Chimal, dem Sohn von Quiauh, der sich gegen die bösen Priester der Göttin Coatlicue behaupten muss und erst am Beginn seiner heldenhaften Entdeckungen steht. Welche düsteren Geheimnisse verbergen die Priester des Kults? Was will die Göttin wirklich von den Menschen?
+
 Ein lokaler 2D-Plattformer-Prototyp im Geist klassischer Side-Scroller, mit einem eigenständigen Maya-Abenteurer, Canvas-Rendering, Parallax-Landschaft sowie Keyboard- und Xbox-Gamepad-Steuerung.
 
 ## Start
@@ -14,11 +18,16 @@ Danach `http://localhost:8080` öffnen. Alternativ funktioniert in vielen Browse
 
 Der Level-Editor ist unter `http://localhost:8080/level-editor.html` erreichbar.
 
+Vor dem Spielstart erscheint ein Startdialog für Spielername und Ausgabeformat. Unterstützt werden automatische Fensteranpassung sowie 960×540, 1280×720, 1600×900 und 1920×1080. Die Spiellogik bleibt auf einer stabilen internen 1280×720-Arbeitsfläche; Canvas, Sprites und Hintergründe werden gemeinsam auf die verfügbare beziehungsweise gewählte Darstellungsgröße skaliert.
+
 ## Level-Editor
 
 - Levelelemente und Spawnpunkte besitzen getrennte Ebenen und dürfen auf demselben Rasterfeld liegen.
 - Themes werden links als Paletten gewählt: Village, Dschungel, Mountain, Tempel, Dungeon und Gameplay können innerhalb desselben Levels beliebig kombiniert werden.
 - Linksklick und Ziehen malt das aktive Element fortlaufend ins Raster; jedes Feld wird pro Malvorgang höchstens einmal belegt. Rechtsklick löscht nur auf der aktiven Ebene.
+- Vier Bearbeitungsmodi trennen Zeichnen, Auswählen, rasterweises Verschieben und Löschen. Terrain, Spawns und Hintergrundobjekte bleiben getrennt wählbar.
+- Hintergrundobjekte können zusätzlich nach Z-Depth 0–5 gefiltert, umrandet, ausgewählt, verschoben, skaliert oder gelöscht werden.
+- **Level leeren** erzeugt einen vollständig leeren Level ohne Terrain, Spawns, Katalogobjekte oder Theme-Zuweisungen; **Neu** erzeugt weiterhin die kleine Startvorlage.
 - Eigenschaften wie Position, Breite und Höhe lassen sich numerisch bearbeiten.
 - Ein Level beginnt bei 1280×720 px. Breite und Höhe lassen sich um exakt eine Bildschirmbreite (1280 px) beziehungsweise Bildschirmhöhe (720 px) vergrößern und wieder reduzieren.
 - Die Minimap zeigt das gesamte Level; ein Klick darauf verschiebt den Arbeitsbereich horizontal und vertikal.

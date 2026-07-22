@@ -103,6 +103,7 @@ Die Schutzmaßnahmen sind jetzt:
 - Verwerfen unbekannter Felder und Neuaufbau eines kanonischen Levelobjekts
 - UI-Erzeugung mit `createElement`, `textContent`, `value` und `replaceChildren`
 - Öffnen der Spielvorschau mit `noopener`
+- Spielername und Auflösungswahl werden mit DOM-APIs aufgebaut; der Name gelangt ausschließlich über `textContent` in die Oberfläche.
 
 ## Restrisiken
 
