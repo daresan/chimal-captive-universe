@@ -30,6 +30,8 @@ Vor dem Spielstart erscheint ein Startdialog für Spielername und Ausgabeformat.
 - Hintergrundobjekte können zusätzlich nach Z-Depth 0–5 gefiltert, umrandet, ausgewählt, verschoben, skaliert oder gelöscht werden.
 - **Level leeren** erzeugt einen vollständig leeren Level ohne Terrain, Spawns, Katalogobjekte oder Theme-Zuweisungen; **Neu** erzeugt weiterhin die kleine Startvorlage.
 - Eigenschaften wie Position, Breite und Höhe lassen sich numerisch bearbeiten.
+- Jedes Theme besitzt einen eigenen Aufzugstyp. Nach dem Setzen werden Richtung (horizontal, vertikal, 30° oder 45° in beide Diagonalrichtungen), Streckenlänge und Geschwindigkeit konfiguriert und bestätigt. Start und Ende dürfen in unterschiedlichen Bildschirmabschnitten liegen.
+- Die Fahrstrecke wird im Editor gestrichelt dargestellt: Gelb kennzeichnet eine noch unbestätigte, Grün eine bestätigte Konfiguration.
 - Ein Level beginnt bei 1280×720 px. Breite und Höhe lassen sich um exakt eine Bildschirmbreite (1280 px) beziehungsweise Bildschirmhöhe (720 px) vergrößern und wieder reduzieren.
 - Die Minimap zeigt das gesamte Level; ein Klick darauf verschiebt den Arbeitsbereich horizontal und vertikal.
 - Der Navigator besitzt einen Zoomregler von 35–125 %. Der Editier-Viewport bleibt unabhängig von Levelgröße und Zoom innerhalb des verfügbaren Browserfensters und kann in beide Richtungen scrollen.
@@ -91,6 +93,8 @@ Gehen und Rennen besitzen bewusst deutlich unterschiedliche Geschwindigkeiten. E
 - Versteckte Truhen heilen oder verbessern Angriff, Wurf und Block.
 - Mehrschichtige Parallax-Landschaft mit Z-Tiefen, freigestellten Katalog-Sprites, Wetter und Höhlenbeleuchtung.
 - Weltverankerte Parallaxobjekte bleiben an der im Editor gesetzten Bildschirmposition sichtbar und werden je nach Z-Tiefe mit einer näheren, präsenteren Bewegungsrate dargestellt.
+- Bewegliche Plattformen tragen Chimal und nicht fliegende Gegner mit, pendeln zwischen Start und Endpunkt und kollidieren wie statische Plattformen.
+- Fünf neue Terrain-Familien liefern illustrierte Böden, schmale Plattformen, Aufzüge sowie thematische Idole, Säulen, Altäre, Stege und Hindernisse für Village, Jungle, Mountain, Temple und Dungeon.
 
 ## Sprite-Sheet-Vertrag
 
@@ -111,6 +115,7 @@ Die generierte Chroma-Key-Quelle liegt aus Gründen der Nachvollziehbarkeit unte
 - `level-editor.html` – rasterbasierter Level- und Sprite-Konfigurationseditor
 - `assets/` – Runtime-Sheet und Generierungsquelle
 - `assets/backgrounds/` – fünf bildschirmfüllende Theme-Landschaften
+- `assets/terrain/` – transparenter 5×3-Terrain-Atlas und 15 daraus geschnittene Maya-Spielelemente
 - `tools/build_sprite.py` – deterministische Sheet-Normalisierung (Pillow)
 - `tools/build_enemy_sprites.py` – erzeugt fünf transparente Gegner-Sheets aus dem generierten Atlas
 - `tools/build_catalog_assets.py` – normalisiert das Cougar-Sheet und erzeugt den transparenten Landschaftskatalog

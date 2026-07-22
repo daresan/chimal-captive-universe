@@ -112,3 +112,9 @@ Die Prompts beschreiben Ziele und Entscheidungen, sind aber kein deterministisch
 > Im Löschmodus sollen während einer gedrückten Maustaste alle überfahrenen Elemente gelöscht werden, sofern sie denselben Typ besitzen wie das Objekt, das zu Beginn der Aktion unter dem Mauszeiger lag.
 
 **Ergebnis:** Der erste Linksklick im Löschmodus fixiert Objekttyp und aktive Ebene für die Dauer des Löschstrichs. Beim Ziehen werden ausschließlich darunterliegende Objekte mit genau diesem Typ entfernt; andere Typen, überlagerte Layer und beim Hintergrund ein abweichender Z-Filter bleiben unberührt. Der gesamte Löschstrich erzeugt nur einen Undo-Snapshot.
+
+## 17. Bewegliche Plattformen und illustrierte Spielelemente
+
+> Plattformsteine sollen als Aufzüge horizontal, vertikal oder diagonal mit 30° beziehungsweise 45° innerhalb einer definierbaren Strecke und Geschwindigkeit pendeln. Start- und Endpunkt dürfen in unterschiedlichen Screens liegen. Im Editor wird eine zum Theme passende Plattform gewählt, ein Startpunkt gesetzt, Richtung, Länge und Geschwindigkeit werden gewählt und anschließend bestätigt. Zusätzlich werden harmonischere, Maya-thematische Grafiken und mehr unterschiedliche Spielelemente pro Theme gewünscht.
+
+**Ergebnis:** Levelversion 7 ergänzt fünf thematische Aufzugstypen mit validierter Richtung, Strecke, Geschwindigkeit und Bestätigungsstatus. Editor und Runtime visualisieren beziehungsweise simulieren die Pingpong-Fahrt über beliebig viele Screenabschnitte; Figuren werden auf der Plattform mitgeführt. Ein mit dem eingebauten OpenAI-Bildworkflow erzeugter, lokal freigestellter 5×3-Atlas liefert 15 transparente Terrain-Assets. Village, Jungle, Mountain, Temple und Dungeon erhielten damit illustrierte Böden, Plattformen und Hindernisse sowie zusätzliche Stege, Altäre, Idole, Wachtürme und Aufzüge.
