@@ -95,6 +95,7 @@ Gehen und Rennen besitzen bewusst deutlich unterschiedliche Geschwindigkeiten. E
 - Weltverankerte Parallaxobjekte bleiben an der im Editor gesetzten Bildschirmposition sichtbar und werden je nach Z-Tiefe mit einer näheren, präsenteren Bewegungsrate dargestellt.
 - Bewegliche Plattformen tragen Chimal und nicht fliegende Gegner mit, pendeln zwischen Start und Endpunkt und kollidieren wie statische Plattformen.
 - Fünf neue Terrain-Familien liefern illustrierte Böden, schmale Plattformen, Aufzüge sowie thematische Idole, Säulen, Altäre, Stege und Hindernisse für Village, Jungle, Mountain, Temple und Dungeon.
+- Jede der 15 Terrain-Grafiken besitzt zusätzlich eine kronenlose Füll-/Mittelsegment-Variante. Liegt ein identischer Objekttyp direkt darüber, verwenden Editor und Spiel automatisch dieses Segment; nur die oberste Reihe zeigt Gras, Moos, Dach, Plattformkante oder dekorativen Abschluss.
 
 ## Sprite-Sheet-Vertrag
 
@@ -115,7 +116,7 @@ Die generierte Chroma-Key-Quelle liegt aus Gründen der Nachvollziehbarkeit unte
 - `level-editor.html` – rasterbasierter Level- und Sprite-Konfigurationseditor
 - `assets/` – Runtime-Sheet und Generierungsquelle
 - `assets/backgrounds/` – fünf bildschirmfüllende Theme-Landschaften
-- `assets/terrain/` – transparenter 5×3-Terrain-Atlas und 15 daraus geschnittene Maya-Spielelemente
+- `assets/terrain/` – zwei transparente 5×3-Terrain-Atlanten und 30 daraus geschnittene Abschluss- beziehungsweise Füllsegmente
 - `tools/build_sprite.py` – deterministische Sheet-Normalisierung (Pillow)
 - `tools/build_enemy_sprites.py` – erzeugt fünf transparente Gegner-Sheets aus dem generierten Atlas
 - `tools/build_catalog_assets.py` – normalisiert das Cougar-Sheet und erzeugt den transparenten Landschaftskatalog
