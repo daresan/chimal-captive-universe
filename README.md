@@ -33,7 +33,8 @@ Vor dem Spielstart erscheint ein Startdialog für Spielername und Ausgabeformat.
 - Die Minimap zeigt das gesamte Level; ein Klick darauf verschiebt den Arbeitsbereich horizontal und vertikal.
 - Der Navigator besitzt einen Zoomregler von 35–125 %. Der Editier-Viewport bleibt unabhängig von Levelgröße und Zoom innerhalb des verfügbaren Browserfensters und kann in beide Richtungen scrollen.
 - Eine eigene Hintergrundebene bietet einen erweiterbaren Katalog freigestellter Maya-Landschaftsobjekte mit einstellbarer Z-Tiefe und Skalierung.
-- Jeder horizontale 1280-Pixel-Bildschirmabschnitt kann ein eigenes Village-, Jungle-, Mountain-, Temple- oder Dungeon-Theme mit direktem oder weichem Übergang erhalten.
+- Das Level ist in unabhängige Abschnitte von 1280×720 px gegliedert. Jeder Abschnitt besitzt über `screenX` und `screenY` ein eigenes Village-, Jungle-, Mountain-, Temple- oder Dungeon-Theme. Damit können etwa Dorf, ein Dungeon darunter und ein Tempel- oder Wolkenabschnitt darüber im selben Level liegen.
+- Direkte und weiche Übergänge funktionieren horizontal und vertikal. Nicht zugewiesene Abschnitte bleiben bewusst leer, statt das Theme eines Nachbarabschnitts über die gesamte Levelhöhe zu wiederholen.
 - Jedes Theme verwendet ein bildschirmfüllendes Landschaftsbild; Tag/Nacht und Wetter werden als dynamische Licht- und Atmosphärenebenen darübergelegt.
 - Pro Bildschirmausschnitt stehen Village-, Dschungel-, Mountain-, Tempel- und Dungeon-Vorlagen bereit.
 - Der Horizont kann als Außenbereich mit Tag/Nacht und Wetter (klar, wolkig, Regen oder Schnee) oder als dunkler Höhlen-Innenraum konfiguriert werden.
@@ -48,6 +49,10 @@ Das JSON-Format enthält `terrain`, `spawns` und `sprites` getrennt. Dadurch kan
 ## Gegnerphysik
 
 - Gegner werden erst aktiviert, sobald ihr Spawnpunkt in den sichtbaren Viewport gelangt.
+- Jeder Gegner-Spawn besitzt einen im Editor skalierbaren grünen IDLE-Bewegungsbereich und einen orangefarbenen ALERT-Wahrnehmungsbereich.
+- In IDLE patrouillieren Gegner innerhalb ihres Bereichs. Erst wenn der Spieler den Wahrnehmungsbereich betritt, wechseln sie in ALERT und verfolgen beziehungsweise attackieren ihn.
+- Während ALERT bewegt sich der Wahrnehmungsbereich mit dem Gegner. Ist der Spieler länger außerhalb oder bleibt der Weg länger blockiert, kehrt der Gegner in IDLE zurück.
+- Blockierte Gegner behalten in ALERT die Blickrichtung zum Spieler; beim anschließenden Patrouillieren richten sie sich wieder nach ihrer tatsächlichen Bewegungsrichtung aus.
 - Spieler und laufende Gegner kollidieren mit Hindernissen. Sie dürfen von Kanten auf tiefer gelegene Plattformen fallen und sterben erst, wenn sie ohne Landung das untere Levelende erreichen; fliegende Gegner sind davon ausgenommen.
 - Der Boss behält seine Blickrichtung in der Nähe des Spielers und verwendet im Stillstand die zweite Sprite-Reihe `IDLE_FLOAT`.
 - Bossbewegung und gegenseitige Treffer sind auf die im Editor gesetzte Boss-Arena begrenzt.
