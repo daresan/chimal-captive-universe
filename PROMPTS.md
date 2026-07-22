@@ -100,3 +100,9 @@ Die Prompts beschreiben Ziele und Entscheidungen, sind aber kein deterministisch
 > Der vorherige Commit verursacht erneut ein Flackern beim Cursed Vulture. Der Commit soll als fehlerhaft markiert, mit seinem Vorgänger verglichen und die Behandlung des Gegnerobjekts korrigiert werden.
 
 **Ergebnis:** Commit `b41f8c3` wurde mit dem annotierten Git-Tag `known-bad-b41f8c3` gekennzeichnet. Die gemeinsame Verwendung der Fernangriffsfreigabe als Bewegungsfreigabe ließ `vx` außerhalb der Boss-Arena zwischen Stillstand und Bewegung wechseln; die Darstellung wechselte dadurch zwischen normaler und `IDLE_FLOAT`-Reihe. Fernangriff und Bewegung sind wieder getrennt. Ein expliziter `animState` stabilisiert `IDLE_FLOAT`, die Position bleibt außerhalb der Arena unverändert und eine Richtungstoleranz verhindert Links-/Rechtswechsel bei nahezu identischer X-Position.
+
+## 15. Korrektur der Cursed-Vulture-Flugsequenz
+
+> Die Bewegungssequenz der Cursed Vultures wirkt weiterhin nicht wie Fliegen, sondern wie eine „Störung in der Matrix“. Der letzte korrekte Commit soll als Vergleich dienen.
+
+**Ergebnis:** Das Boss-Sheet selbst war unverändert. Die mit Version 6 eingeführte Frameberechnung multiplizierte jedoch eine bereits zeitbasierte Phase erneut mit der Frameanzahl und beschleunigte normale Animationen von ungefähr 6–9 auf 36–54 Framewechsel pro Sekunde. Außerdem enthält die Bewegungsreihe in den Frames 4–5 bereits die Wurfattacke. Normale Animationen verwenden wieder die ursprüngliche Zeitformel; der Bewegungszustand des Vultures durchläuft ausschließlich die vier zusammenhängenden Flugframes 0–3. `IDLE_FLOAT`, HIT und DEATH bleiben getrennt erhalten.

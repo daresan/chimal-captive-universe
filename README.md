@@ -60,6 +60,7 @@ Das JSON-Format enthält `terrain`, `spawns` und `sprites` getrennt. Dadurch kan
 - Bossbewegung und gegenseitige Treffer sind auf die im Editor gesetzte Boss-Arena begrenzt.
 - Nahkampf und Körperkontakt mit Bossen bleiben an deren Arena gebunden. Spieler- und Gegnerprojektile dürfen Arenagrenzen überqueren.
 - HIT und DEATH besitzen sichtbare, zeitlich abgespielte Sequenzen. Gegner verschwinden erst nach ihrer Todesanimation.
+- Der Cursed Vulture verwendet für Bewegung ausschließlich die vier zusammenhängenden Flugframes. Die beiden Wurf-/Magieframes derselben Sheet-Reihe werden nicht mehr fälschlich in die Flugschleife gemischt.
 
 ## Steuerung
 
