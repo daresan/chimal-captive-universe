@@ -101,3 +101,9 @@ Die neue Figur wurde mit dem eingebauten OpenAI-Imagegen-Workflow auf einfarbige
 Der Prototyp entstand in einer schrittweisen Mensch–KI-Zusammenarbeit. Daresan definierte Spielidee, Maya-Thema, Figuren, Steuerung, Gegnerverhalten, Levelstruktur sowie die Anforderungen an Sprites und Editor. OpenAI Codex setzte diese Vorgaben im lokalen Projekt um, entwickelte die Canvas-Spielmechanik und den Level-Editor, erzeugte und normalisierte Bildassets, testete die Änderungen und pflegte den Git-Verlauf.
 
 Die maßgeblichen Nutzer-Prompts und die daraus entstandenen Entwicklungsschritte sind zur öffentlichen Nachvollziehbarkeit in [PROMPTS.md](PROMPTS.md) dokumentiert.
+
+## Sicherheit und Entwicklungsprozess
+
+- [SECURITY_AUDIT.md](SECURITY_AUDIT.md) dokumentiert Prüfbereich, reproduzierbare Befehle, Befunde und umgesetzte Schutzmaßnahmen.
+- [DEFAULT_CODEX_PROMPT.md](DEFAULT_CODEX_PROMPT.md) enthält den vereinbarten Standard-Prompt für Git-Workflow, Dokumentationspflege und Prompt-/Ergebnisprotokoll.
+- Importierte Leveldaten werden gegen bekannte Typen und zulässige Werte normalisiert. Importabhängige UI wird mit sicheren DOM-APIs aufgebaut; Spritequellen müssen lokale PNG-Dateien unter `assets/` sein.

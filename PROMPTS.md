@@ -52,3 +52,21 @@ Dieses Dokument hält die maßgeblichen Vorgaben fest, anhand derer **Chimal –
 ## Hinweis zur Reproduzierbarkeit
 
 Die Prompts beschreiben Ziele und Entscheidungen, sind aber kein deterministisches Build-Rezept. Der konkrete Stand ergibt sich aus Quellcode, Assets, Werkzeugskripten und Git-Historie dieses Repositories. Generative Bildausgaben können bei erneuter Erzeugung variieren; die verwendeten und normalisierten Ergebnisse sind deshalb im Repository enthalten.
+
+## 7. Credits und öffentliche Prompt-Dokumentation
+
+> Im README sollen Credits für die Arbeit von OpenAI Codex anhand der Prompts ergänzt werden. Die Prompts sollen in einer eigenen Datei in das Repository aufgenommen werden, damit die Entstehung öffentlich nachvollziehbar ist.
+
+**Ergebnis:** README-Credits und dieses redaktionell geglättete Promptprotokoll wurden ergänzt und veröffentlicht. Idee, kreative Leitung und Anforderungen werden Daresan zugeordnet; Implementierung, technische Ausarbeitung, Dokumentation und KI-gestützte Asset-Aufbereitung werden OpenAI Codex zugeordnet.
+
+## 8. Sicherheitsprüfung
+
+> Das Repository soll darauf untersucht werden, dass es keine Secrets, lokalen Pfade, Umgebungsvariablen oder sonstige sicherheitsbedenkliche Inhalte enthält.
+
+**Ergebnis:** Arbeitsbaum und erreichbare Git-Historie wurden nach typischen Secret- und Pfadmustern durchsucht. Es wurden keine Zugangsdaten oder lokalen Benutzerpfade gefunden. Als relevante Schwachstelle wurde die Verarbeitung nicht vertrauenswürdiger Level-JSON-Werte über `innerHTML` erkannt; außerdem wurden die öffentliche Git-Autorenadresse und harmlose XMP-Metadaten als Datenschutz-/Hygienehinweise dokumentiert.
+
+## 9. Nachweisbarer Audit und Import-Härtung
+
+> Die Behauptungen des Security Audits sollen überprüfbar belegt werden. Anschließend soll die JSON-Import-/DOM-Verarbeitung abgesichert, die Repository-Dokumentation einschließlich Audit und Promptliste in einem neuen Commit aktualisiert und ein Default-Prompt für den etablierten Git- und Dokumentationsworkflow erstellt werden.
+
+**Ergebnis:** Die reproduzierbaren Prüfkommandos und ihre Bewertung stehen in `SECURITY_AUDIT.md`. Der Editor normalisiert importierte und gespeicherte Leveldaten anhand von Allowlists, Grenzen und sicheren lokalen Assetpfaden. Importabhängige Oberflächen werden ohne HTML-Interpolation erzeugt. `DEFAULT_CODEX_PROMPT.md` hält den künftigen Workflow fest.
